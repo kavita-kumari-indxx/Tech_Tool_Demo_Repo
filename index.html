@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indxx Tools – Demo Dashboard</title>
+<style>
+:root{
+ --font-anthropic-sans: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-anthropic-serif: Georgia,"Times New Roman",serif;
+ --color-bg:#ffffff;--color-panel:#f7f7f5;--color-fg:#1f1f1f;--color-fg-muted:#6b6b6b;
+ --color-border-line:#e2e2de;--color-ok:#2f7d4f;--color-warn:#a8660b;--color-bad:#b3261e;
+ --cds-font-size-title:1.75rem;--cds-font-size-heading:1.05rem;--cds-font-size-body:.95rem;--cds-font-size-caption:.8rem;
+ --cds-font-weight-medium:600;--cds-gap-xs:.25rem;--cds-gap-sm:.5rem;--cds-gap-md:1rem;--cds-gap-lg:1.5rem;
+ --cds-pad-xs:.25rem;--cds-pad-sm:.5rem;--cds-pad-md:.75rem;--cds-pad-lg:1.1rem;--cds-radius:8px;--cds-dur-slow:.3s;
+}
+@media (prefers-color-scheme: dark){:root{--color-bg:#1b1b1a;--color-panel:#242423;--color-fg:#ededeb;--color-fg-muted:#a3a39e;--color-border-line:#3a3a38;--color-ok:#6cc391;--color-warn:#e0a548;--color-bad:#f08a80}}
+html,body{margin:0;background:var(--color-bg)}
+#dash-root{max-width:1200px;margin:0 auto;padding:1.5rem 1.25rem 3rem}
+.it-print{font:inherit;font-size:var(--cds-font-size-caption);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:var(--cds-radius);padding:var(--cds-pad-xs) var(--cds-pad-md);cursor:pointer}
+@media print{.it-hero,.it-hero h1::first-letter,.it-stripe span,.it-step .it-sn,.it-chip.it-high,.it-evo td.adv::before,.it-lvl-c,.it-geo-grp td,.it-verify,.it-verify-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}.it-tabbar,.it-print,.it-switch,.it-filters{display:none}.it-tool:not([hidden]) .it-sect[hidden]{display:block!important}.it-card{break-inside:avoid}}
+
+#dash-root .it{font-family:var(--font-anthropic-sans);color:var(--color-fg)}
+.it-badge{display:inline-block;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);border-radius:999px;padding:2px 10px;color:var(--color-fg-muted);margin-bottom:var(--cds-gap-sm)}
+.it h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0 0 var(--cds-gap-md)}
+.it-take{color:var(--color-fg-muted);margin:var(--cds-gap-xs) 0 var(--cds-gap-md)}
+.it-tabs{display:flex;gap:var(--cds-gap-xs);flex-wrap:wrap;border-bottom:1px solid var(--color-border-line);margin-bottom:var(--cds-gap-md)}
+.it-tabs button{font:inherit;background:none;border:none;border-bottom:2px solid transparent;padding:var(--cds-pad-sm) var(--cds-pad-md);color:var(--color-fg-muted);cursor:pointer}
+.it-tabs button[aria-selected="true"]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:var(--cds-font-weight-medium)}
+.it-pane{margin-bottom:var(--cds-gap-lg)}
+.it-sec{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0 0 var(--cds-gap-sm)}
+.it-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--cds-gap-md);margin-bottom:var(--cds-gap-md)}
+.it-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr));gap:var(--cds-gap-md);margin-bottom:var(--cds-gap-md)}
+.it-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg)}
+.it-card h2,.it-card h3{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0 0 var(--cds-gap-xs)}
+.it-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:0 0 var(--cds-gap-sm)}
+.it-lbl{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.it-num{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);font-weight:400;font-variant-numeric:tabular-nums;margin:var(--cds-gap-xs) 0}
+.it-chip{display:inline-block;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);border-radius:999px;padding:1px 8px;color:var(--color-fg-muted)}
+.it-chip.v3{color:var(--color-ok)}
+.it-tl{list-style:none;margin:0;padding:0;position:relative}
+.it-tl li{position:relative;padding:0 0 var(--cds-gap-md) 1.6rem}
+.it-tl li::before{content:"";position:absolute;left:5px;top:6px;bottom:-6px;width:2px;background:var(--color-border-line)}
+.it-tl li:last-child::before{display:none}
+.it-dot{position:absolute;left:0;top:4px;width:12px;height:12px;border-radius:50%;background:var(--color-fg)}
+.it-tl li.next .it-dot{background:var(--color-panel);border:2px solid var(--color-warn)}
+.it-tl .it-date{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.it-tl .it-ev{font-weight:var(--cds-font-weight-medium)}
+.it-tl .it-det{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.it-flow{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:stretch}
+.it-step{flex:1 1 9rem;background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md);position:relative}
+.it-step .it-sn{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.it-step .it-st{font-weight:var(--cds-font-weight-medium);margin:2px 0}
+.it-step .it-role{font-size:var(--cds-font-size-caption);color:var(--color-ok)}
+.it-step .it-ctl{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:var(--cds-gap-xs)}
+.it-tablewrap{overflow-x:auto}
+.it-table{width:100%;border-collapse:collapse}
+.it-table th{text-align:left;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);border-bottom:1px solid var(--color-border-line);padding:var(--cds-pad-xs) var(--cds-pad-sm);white-space:nowrap}
+.it-table td{border-bottom:1px solid var(--color-border-line);padding:var(--cds-pad-sm);vertical-align:top;font-size:var(--cds-font-size-body)}
+.it-table td:first-child{font-weight:var(--cds-font-weight-medium);white-space:nowrap}
+.it-table .c3{background:color-mix(in srgb,var(--color-ok) 7%,transparent)}
+.it-evo{table-layout:fixed;min-width:36rem}
+.it-evo th{font-size:var(--cds-font-size-body);color:var(--color-fg);padding:var(--cds-pad-sm) var(--cds-pad-md);border-bottom:1px solid var(--color-fg)}
+.it-evo th:first-child{width:10rem}
+.it-evo td{padding:var(--cds-pad-md);border-bottom:1px solid var(--color-border-line);line-height:1.45}
+.it-evo tr:last-child td{border-bottom:none}
+.it-evo td:first-child{font-weight:var(--cds-font-weight-medium);white-space:normal}
+.it-evo td.adv{color:var(--color-ok);font-weight:var(--cds-font-weight-medium);padding-left:calc(var(--cds-pad-md) + 1.1rem);position:relative}
+.it-evo td.adv::before{content:"✓";position:absolute;left:var(--cds-pad-md);top:var(--cds-pad-md)}
+.it-evo tr.it-flag td{background:color-mix(in srgb,var(--color-warn) 14%,transparent)}
+.it-evo tr.it-flag td:first-child{box-shadow:inset 3px 0 0 var(--color-warn)}
+.it-evo tr.it-flag td:first-child::after{content:"To verify";display:block;margin-top:4px;width:max-content;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:var(--color-warn);border:1px solid var(--color-warn);border-radius:999px;padding:0 8px}
+.it-sub{margin:-0.5rem 0 var(--cds-gap-md);color:var(--color-fg-muted);font-size:var(--cds-font-size-body)}
+.it-cmp h2{margin-bottom:var(--cds-gap-md)}
+.it-toggles{display:flex;gap:var(--cds-gap-sm);margin:0 0 var(--cds-gap-md)}
+.it-toggles button{font:inherit;font-size:var(--cds-font-size-caption);background:none;border:1px solid var(--color-border-line);border-radius:999px;padding:2px 12px;color:var(--color-fg-muted);cursor:pointer}
+.it-toggles button:hover{color:var(--color-fg);border-color:var(--color-fg-muted)}
+.it-sect{border-top:1px solid var(--color-border-line)}
+.it-sect:last-of-type{border-bottom:1px solid var(--color-border-line)}
+.it-sect>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:var(--cds-gap-sm);padding:var(--cds-pad-md) 0}
+.it-sect>summary::-webkit-details-marker{display:none}
+.it-sect>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--color-fg-muted);border-bottom:2px solid var(--color-fg-muted);transform:rotate(-45deg);transition:transform var(--cds-dur-slow);flex:none;margin-right:2px}
+.it-sect[open]>summary::before{transform:rotate(45deg)}
+.it-sect>summary:focus-visible{outline:2px solid var(--color-fg);outline-offset:2px}
+.it-sect>summary h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.it-sect-body{padding-bottom:var(--cds-gap-lg)}
+.it-sect-body>.it-grid:last-child{margin-bottom:0}
+@media (prefers-reduced-motion: reduce){.it-sect>summary::before{transition:none}}
+.it-mod dt{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:var(--cds-gap-sm)} .it-mod dd{margin:2px 0 0}
+.it-filters{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);margin-bottom:var(--cds-gap-md)}
+.it-filters select,.it-filters input{font:inherit;padding:var(--cds-pad-xs) var(--cds-pad-sm);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-bg);color:var(--color-fg)}
+.it-filters input{flex:1;min-width:12rem}
+.it-q{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);margin-bottom:var(--cds-gap-sm)}
+.it-q summary{cursor:pointer;padding:var(--cds-pad-md);list-style:none;display:flex;gap:var(--cds-gap-sm)}
+.it-q summary::-webkit-details-marker{display:none}
+.it-qid{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);min-width:2.2rem;padding-top:2px}
+.it-qt{flex:1;font-weight:var(--cds-font-weight-medium)}
+.it-chips{display:flex;gap:var(--cds-gap-xs);flex-wrap:wrap;margin-top:var(--cds-gap-xs);font-weight:400}
+.it-body{padding:0 var(--cds-pad-md) var(--cds-pad-md) calc(var(--cds-pad-md) + 2.2rem + var(--cds-gap-sm))}
+.it-body .it-k{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:var(--cds-gap-sm)}
+.it-body p{margin:2px 0 0}
+.it-high{color:var(--color-bad)}
+.it-count{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:var(--cds-gap-sm)}
+[data-dash-source-state=empty]{color:transparent}
+[data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+
+/* ===== Colour theme ===== */
+.it{--ink:#14213D;--c1:#3A4FD7;--c2:#0E9F8E;--c3:#F2545B;--c4:#E8961E;--c5:#8E5CD9;--c6:#1E88E5;--tint:5%}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it{--c1:#7B8CFF;--c2:#2CC7B3;--c3:#FF7A80;--c4:#F5B54A;--c5:#B58CFF;--c6:#5AB0FF;--tint:12%}}
+:root[data-theme="dark"] .it{--c1:#7B8CFF;--c2:#2CC7B3;--c3:#FF7A80;--c4:#F5B54A;--c5:#B58CFF;--c6:#5AB0FF;--tint:12%}
+.it-hero{background:var(--ink);background-image:radial-gradient(circle at 100% 0%,rgba(58,79,215,.55),transparent 55%);color:#fff;border-radius:16px;padding:1.4rem 1.5rem 0;margin-bottom:var(--cds-gap-md);overflow:hidden}
+.it-hero h1{color:#fff;margin:.2rem 0 .35rem;font-size:calc(var(--cds-font-size-title) * 1.15);line-height:1.15}
+.it-hero .it-tag{color:#C9D2F5;margin:0 0 1.1rem;font-size:var(--cds-font-size-body)}
+.it-hero .it-badge{color:#C9D2F5;border-color:rgba(255,255,255,.28);margin-bottom:.2rem}
+.it-hero .it-print{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+.it-stripe{display:flex;height:9px;margin:0 -1.5rem}
+.it-stripe span{display:block}
+.it-stripe span:nth-child(1){flex:5;background:#3A4FD7}.it-stripe span:nth-child(2){flex:3;background:#0E9F8E}.it-stripe span:nth-child(3){flex:2;background:#F2545B}.it-stripe span:nth-child(4){flex:2;background:#E8961E}.it-stripe span:nth-child(5){flex:1.4;background:#8E5CD9}.it-stripe span:nth-child(6){flex:1;background:#1E88E5}
+.it-toggles button{border-color:color-mix(in srgb,var(--c1) 45%,transparent);color:var(--c1)}
+.it-toggles button:hover{background:color-mix(in srgb,var(--c1) 10%,transparent);color:var(--c1)}
+/* sections */
+.it-sect:nth-of-type(1){--acc:var(--c1)}.it-sect:nth-of-type(2){--acc:var(--c2)}.it-sect:nth-of-type(3){--acc:var(--c3)}.it-sect:nth-of-type(4){--acc:var(--c5)}.it-sect:nth-of-type(5){--acc:var(--c4)}.it-sect:nth-of-type(6){--acc:var(--c6)}
+.it-sect{border:none;border-left:5px solid var(--acc);border-radius:12px;background:color-mix(in srgb,var(--acc) var(--tint),var(--color-bg));margin-bottom:12px;padding:0 var(--cds-pad-lg)}
+.it-sect:last-of-type{border-bottom:none}
+.it-sect>summary{padding:var(--cds-pad-lg) 0}
+.it-sect>summary h2{font-size:calc(var(--cds-font-size-heading) * 1.12)}
+.it-sect>summary::before{border-color:var(--acc)}
+.it-sect .it-card{background:var(--color-bg);border-color:color-mix(in srgb,var(--acc) 22%,var(--color-border-line))}
+/* tiles */
+.it-tiles>.it-card:nth-child(1){--k:var(--c1)}.it-tiles>.it-card:nth-child(2){--k:var(--c2)}.it-tiles>.it-card:nth-child(3){--k:var(--c3)}.it-tiles>.it-card:nth-child(4){--k:var(--c4)}.it-tiles>.it-card:nth-child(5){--k:var(--c5)}.it-tiles>.it-card:nth-child(6){--k:var(--c6)}
+.it-tiles>.it-card{border-top:5px solid var(--k);display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:2px}
+.it-tiles .it-num{color:var(--k);font-size:calc(var(--cds-font-size-title) * 1.35);line-height:1.05;margin:0}
+/* timeline + messages */
+.it-tl li:nth-child(1) .it-dot{background:var(--c1)}.it-tl li:nth-child(2) .it-dot{background:var(--c2)}
+.it-tl li.next .it-dot{background:var(--color-bg);border:3px solid var(--c3);width:8px;height:8px}
+.it-tl li.next .it-ev{color:var(--c3)}
+.it-msgs li::marker{color:var(--acc);font-weight:700}
+.it-msgs li:nth-child(1) b{color:var(--c1)}.it-msgs li:nth-child(2) b{color:var(--c2)}.it-msgs li:nth-child(3) b{color:var(--c3)}
+/* transformation table */
+.it-evo th{border-bottom-color:var(--acc)}
+.it-evo td:first-child{color:var(--acc)}
+.it-evo td.adv{color:var(--c2)}
+.it-evo td.adv::before{content:"✓";color:#fff;background:var(--c2);border-radius:50%;width:1.05rem;height:1.05rem;font-size:.7rem;display:flex;align-items:center;justify-content:center}
+.it-evo tbody tr:hover td{background:color-mix(in srgb,var(--acc) 6%,transparent)}
+/* workflow */
+.it-flow{gap:1.6rem}
+.it-step{border-top:5px solid var(--s)}
+.it-step:nth-child(1){--s:var(--c1)}.it-step:nth-child(2){--s:var(--c3)}.it-step:nth-child(3){--s:var(--c2)}.it-step:nth-child(4){--s:var(--c4)}.it-step:nth-child(5){--s:var(--c5)}
+.it-step .it-sn{display:inline-block;background:var(--s);color:#fff;border-radius:999px;padding:1px 9px;font-weight:var(--cds-font-weight-medium)}
+.it-step .it-role{color:var(--s);font-weight:var(--cds-font-weight-medium)}
+.it-step:not(:last-child)::after{content:"→";position:absolute;right:-1.3rem;top:50%;transform:translateY(-50%);color:var(--acc);font-size:1.2rem;font-weight:700}
+@media (max-width:700px){.it-step:not(:last-child)::after{display:none}}
+/* modules */
+.it-modcards>.it-card:nth-child(6n+1){--m:var(--c1)}.it-modcards>.it-card:nth-child(6n+2){--m:var(--c2)}.it-modcards>.it-card:nth-child(6n+3){--m:var(--c3)}.it-modcards>.it-card:nth-child(6n+4){--m:var(--c4)}.it-modcards>.it-card:nth-child(6n+5){--m:var(--c5)}.it-modcards>.it-card:nth-child(6n+6){--m:var(--c6)}
+.it-modcards>.it-card{border-top:5px solid var(--m)}
+.it-modcards h3{color:var(--m)}
+/* demo script */
+.it-demotable td:first-child{color:var(--acc);font-variant-numeric:tabular-nums}
+.it-demotable td:nth-child(2){font-weight:var(--cds-font-weight-medium)}
+.it-demotable th{border-bottom:2px solid var(--acc)}
+/* Q&A */
+.it-q{border-left:4px solid color-mix(in srgb,var(--acc) 55%,transparent);background:var(--color-bg)}
+.it-q[open]{border-left-color:var(--acc)}
+.it-qid{color:var(--acc);font-weight:var(--cds-font-weight-medium)}
+.it-chip.it-high{background:var(--c3);color:#fff;border-color:var(--c3)}
+.it-body .it-k{color:var(--acc);font-weight:var(--cds-font-weight-medium)}
+.it-filters input,.it-filters select{background:var(--color-bg)}
+.it-evo td.adv{padding-left:calc(var(--cds-pad-md) + 1.6rem)}
+.it-pts{margin:0;padding-left:1.2rem;line-height:1.6}
+.it-pts li::marker{color:var(--acc)}
+.it-verify{background:color-mix(in srgb,var(--c4) 22%,transparent);border-bottom:2px solid var(--c4);padding:1px 4px;border-radius:4px}
+.it-verify-tag{display:inline-block;margin-left:6px;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:var(--c4);border:1px solid var(--c4);border-radius:999px;padding:0 7px;vertical-align:1px;background:var(--color-bg)}
+@media print{.it-verify,.it-verify-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* ===== Indxx brand theme ===== */
+.it{--ink:#171A21;--c1:#EF3025;--c2:#171A21;--c3:#B8231B;--c4:#5E626B;--c5:#6F6E72;--c6:#EF3025;--amber:#D98A12;--silver:#B5B3B4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it{--c1:#FF4A3F;--c2:#E6E5E6;--c3:#FF7A70;--c4:#A3A6AD;--c5:#C9C7C8;--c6:#FF4A3F;--amber:#F5B54A}}
+:root[data-theme="dark"] .it{--c1:#FF4A3F;--c2:#E6E5E6;--c3:#FF7A70;--c4:#A3A6AD;--c5:#C9C7C8;--c6:#FF4A3F;--amber:#F5B54A}
+.it-hero{background:#171A21;background-image:radial-gradient(circle at 100% 0%,rgba(239,48,37,.28),transparent 50%)}
+.it-hero h1::first-letter{color:#EF3025}
+.it-hero .it-tag,.it-hero .it-badge{color:#B5B3B4}
+.it-stripe span:nth-child(1){background:#EF3025}.it-stripe span:nth-child(2){background:#B5B3B4}.it-stripe span:nth-child(3){background:#B8231B}.it-stripe span:nth-child(4){background:#8E8C8D}.it-stripe span:nth-child(5){background:#EF3025}.it-stripe span:nth-child(6){background:#5E626B}
+.it-evo td.adv{color:var(--c2)}
+.it-evo td.adv::before{background:var(--c1)}
+.it-verify{background:color-mix(in srgb,var(--amber) 22%,transparent);border-bottom-color:var(--amber)}
+.it-verify-tag{color:var(--amber);border-color:var(--amber)}
+.it-tl li.next .it-dot{border-color:var(--c1)}
+.it-tl li.next .it-ev{color:var(--c1)}
+
+/* ===== Horizontal tabs ===== */
+.it-tabbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 var(--cds-gap-md);padding:4px;background:color-mix(in srgb,var(--c2) 6%,var(--color-bg));border:1px solid var(--color-border-line);border-radius:12px}
+.it-tabbar::-webkit-scrollbar{display:none}
+.it-tabbar button{font:inherit;font-size:var(--cds-font-size-body);white-space:nowrap;flex:1 0 auto;background:none;border:none;border-radius:9px;padding:var(--cds-pad-sm) var(--cds-pad-lg);color:var(--color-fg-muted);cursor:pointer;font-weight:var(--cds-font-weight-medium);position:relative}
+.it-tabbar button:hover{color:var(--color-fg);background:color-mix(in srgb,var(--c1) 8%,transparent)}
+.it-tabbar button[aria-selected="true"]{background:var(--c1);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--c1) 35%,transparent)}
+.it-tabbar button:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+.it-sect[hidden]{display:none}
+.it-sect{padding-top:var(--cds-pad-lg)}
+.it-sect-body{padding-bottom:var(--cds-pad-lg)}
+
+/* ===== Tool switcher ===== */
+.it-hero-top{display:flex;align-items:center;gap:var(--cds-gap-sm);flex-wrap:wrap}
+.it-switch{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px;margin-left:auto}
+.it-switch button{font:inherit;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);background:none;border:none;color:#C9C7C8;padding:5px 16px;border-radius:999px;cursor:pointer}
+.it-switch button[aria-pressed="true"]{background:#EF3025;color:#fff}
+.it-switch button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.it-hero .it-print{float:none}
+.it-tool[hidden]{display:none}
+.it-flow{flex-wrap:nowrap}
+.it-step{flex:1 1 0;min-width:0}
+.it-step:nth-child(6){--s:var(--c1)}
+@media (max-width:900px){.it-flow{flex-wrap:wrap}.it-step{flex:1 1 10rem}.it-step:not(:last-child)::after{display:none}}
+.it-subs{margin-top:var(--cds-gap-md);padding-top:var(--cds-gap-sm);border-top:1px dashed color-mix(in srgb,var(--m) 40%,var(--color-border-line))}
+.it-subs-h{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:var(--cds-gap-xs)}
+.it-sub-item{border-left:3px solid var(--m);padding:4px 0 4px 10px;margin:6px 0 0 4px;background:color-mix(in srgb,var(--m) 6%,transparent);border-radius:0 6px 6px 0}
+.it-sub-name{font-weight:var(--cds-font-weight-medium);color:var(--m)}
+.it-sub-what{font-size:var(--cds-font-size-caption);color:var(--color-fg)}
+.it-modlink{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;text-decoration-color:color-mix(in srgb,var(--m) 45%,transparent);display:inline-flex;align-items:center;gap:6px}
+.it-modlink:hover{text-decoration-color:var(--m)}
+.it-modlink:focus-visible{outline:2px solid var(--m);outline-offset:3px;border-radius:4px}
+.it-modlink-ic{font-size:.8em;background:var(--m);color:#fff;border-radius:6px;padding:1px 6px;text-decoration:none}
+.it-dlg{border:none;border-radius:16px;padding:0;width:min(640px,calc(100vw - 2rem));max-height:calc(100vh - 3rem);background:var(--color-bg);color:var(--color-fg);box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:var(--font-anthropic-sans)}
+.it-dlg::backdrop{background:rgba(23,26,33,.55)}
+.it-dlg-head{display:flex;align-items:center;justify-content:space-between;background:#171A21;color:#fff;padding:var(--cds-pad-md) var(--cds-pad-lg);border-bottom:4px solid #EF3025;position:sticky;top:0}
+.it-dlg-head h3{margin:0;font-size:var(--cds-font-size-heading)}
+.it-dlg-x{font:inherit;font-size:1.4rem;line-height:1;background:none;border:none;color:#fff;cursor:pointer;padding:0 4px}
+.it-dlg-body{padding:var(--cds-pad-lg);display:grid;gap:var(--cds-gap-sm)}
+.it-feat{display:flex;gap:var(--cds-gap-md);padding:var(--cds-pad-md);border:1px solid var(--color-border-line);border-radius:10px;background:var(--color-panel)}
+.it-feat-n{flex:none;width:28px;height:28px;border-radius:50%;background:#EF3025;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:var(--cds-font-weight-medium);font-size:var(--cds-font-size-caption)}
+.it-feat.alt .it-feat-n{background:#171A21}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it-feat.alt .it-feat-n{background:#5E626B}}
+.it-feat-name{font-weight:var(--cds-font-weight-medium)}
+.it-feat-desc{color:var(--color-fg-muted);margin-top:2px}
+.it-feat-ex{display:flex;gap:var(--cds-gap-sm);margin-top:var(--cds-gap-sm);flex-wrap:wrap}
+.it-feat-stat{display:flex;flex-direction:column;background:var(--color-bg);border:1px solid var(--color-border-line);border-top:3px solid #EF3025;border-radius:8px;padding:6px 14px}
+.it-feat-y{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.it-feat-v{font-family:var(--font-anthropic-serif);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.it-feat-note{margin-top:var(--cds-gap-sm);font-size:var(--cds-font-size-caption);background:color-mix(in srgb,#EF3025 8%,transparent);border-left:3px solid #EF3025;padding:6px 10px;border-radius:0 6px 6px 0}
+.it-feat-access{display:flex;align-items:center;gap:8px;font-size:var(--cds-font-size-caption);background:color-mix(in srgb,#171A21 6%,var(--color-bg));border:1px solid var(--color-border-line);border-radius:8px;padding:8px 12px}
+.it-feat-lock{background:#171A21;color:#fff;border-radius:999px;padding:1px 9px;font-weight:var(--cds-font-weight-medium)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it-feat-lock{background:#5E626B}}
+.it-feat-pts{margin:6px 0 0;padding-left:1.1rem;line-height:1.55}
+.it-feat-pts li::marker{color:#EF3025}
+.it-feat-chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.it-feat-chip{font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);border-radius:999px;padding:2px 12px;border:1px solid var(--color-border-line);background:var(--color-bg)}
+
+.it-feat-role{margin-top:var(--cds-gap-sm);border:1px solid color-mix(in srgb,#171A21 25%,var(--color-border-line));border-radius:10px;overflow:hidden;background:var(--color-bg)}
+.it-feat-role-h{display:flex;align-items:center;gap:8px;padding:6px 10px;background:color-mix(in srgb,#171A21 7%,var(--color-bg));font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);border-bottom:1px solid var(--color-border-line)}
+.it-feat-role-tag{background:#171A21;color:#fff;border-radius:999px;padding:1px 10px;font-weight:var(--cds-font-weight-medium);letter-spacing:.02em}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it-feat-role-tag{background:#5E626B}}
+.it-feat-role-pts{margin:0;padding:8px 12px 8px 1.9rem;line-height:1.75}
+.it-feat-role-pts li::marker{color:#171A21}
+.it-ui-btn{display:inline-block;font-size:.78em;font-weight:var(--cds-font-weight-medium);letter-spacing:.03em;text-transform:uppercase;color:#EF3025;border:1px solid #EF3025;border-radius:5px;padding:0 6px;margin:0 2px;line-height:1.6;background:color-mix(in srgb,#EF3025 6%,var(--color-bg));white-space:nowrap}
+.it-feat-steps{margin:8px 0 0;padding:0;list-style:none;counter-reset:st;display:grid;gap:6px}
+.it-feat-steps li{counter-increment:st;display:flex;gap:10px;align-items:flex-start;background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:8px;padding:6px 10px}
+.it-feat-steps li::before{content:counter(st);flex:none;width:20px;height:20px;border-radius:50%;border:2px solid #EF3025;color:#EF3025;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.it-feat-chips .it-feat-chip:not([class*="it-tone-"]){color:var(--color-fg)}
+.it-feat-grp{display:flex;gap:10px;align-items:baseline;margin-top:8px;flex-wrap:wrap}
+.it-feat-grp-l{flex:none;width:8.5rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium)}
+.it-feat-grp .it-feat-chips{margin-top:0;flex:1;min-width:12rem}
+@media (max-width:560px){.it-feat-grp-l{width:auto}}
+.it-tone-ok{color:#1E8E5A;border-color:#1E8E5A;background:color-mix(in srgb,#1E8E5A 8%,var(--color-bg))}
+.it-tone-fail{color:#EF3025;border-color:#EF3025;background:color-mix(in srgb,#EF3025 8%,var(--color-bg))}
+.it-tone-warn{color:#B97308;border-color:#D98A12;background:color-mix(in srgb,#D98A12 10%,var(--color-bg))}
+.it-tone-info{color:#2E5DB8;border-color:#2E5DB8;background:color-mix(in srgb,#2E5DB8 8%,var(--color-bg))}
+.it-tone-muted{color:var(--color-fg-muted);border-style:dashed}
+.it-tone-total{background:#171A21;color:#fff;border-color:#171A21}
+.it-feat-purpose{background:#171A21;color:#E6E5E6;border-radius:10px;padding:10px 14px;border-left:4px solid #EF3025}
+.it-feat-purpose-h{font-size:var(--cds-font-size-caption);text-transform:uppercase;letter-spacing:.06em;color:#EF3025;font-weight:700;margin-bottom:4px}
+.it-feat-purpose ul{margin:0;padding-left:1.1rem;columns:2;column-gap:1.5rem;line-height:1.6}
+@media (max-width:560px){.it-feat-purpose ul{columns:1}}
+.it-feat-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.it-feat-flowstep{font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);background:#171A21;color:#fff;border-radius:8px;padding:5px 11px}
+.it-feat-flowstep:last-child{background:#EF3025}
+.it-feat-arrow{color:#EF3025;font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .it-feat-flowstep{background:#5E626B}:root:not([data-theme="light"]) .it-feat-flowstep:last-child{background:#EF3025}}
+.it-sublink{font-weight:var(--cds-font-weight-medium);text-decoration-thickness:1.5px;text-underline-offset:3px}
+.it-sublink .it-modlink-ic{font-size:.72em;padding:0 5px}
+.it-geo{min-width:52rem}
+.it-geo th{font-size:var(--cds-font-size-caption);white-space:normal;vertical-align:bottom;border-bottom:2px solid var(--acc)}
+.it-geo td{padding:7px 8px;vertical-align:middle}
+.it-geo-grp td{background:#171A21;color:#fff;font-size:var(--cds-font-size-caption);text-transform:uppercase;letter-spacing:.06em;font-weight:700;padding:5px 10px}
+.it-geo-type{min-width:15rem;max-width:20rem}.it-geo-type>div:first-child{font-weight:var(--cds-font-weight-medium)}
+.it-geo-in{text-align:center;font-weight:700}
+.it-geo-in.yes{color:#1E8E5A}.it-geo-in.no{color:var(--color-fg-muted)}
+.it-geo-cell{text-align:center}
+.it-geo-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:400;margin-top:2px;line-height:1.35}
+.it-lvl{display:inline-block;font-size:.72rem;font-weight:var(--cds-font-weight-medium);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.it-lvl-c{background:#EF3025;color:#fff}
+.it-lvl-o{background:color-mix(in srgb,#EF3025 14%,var(--color-bg));color:#B8231B;border:1px solid color-mix(in srgb,#EF3025 40%,transparent)}
+.it-lvl-r{background:transparent;color:var(--color-fg-muted);border:1px dashed var(--color-border-line)}
+.it-geo-legend{display:flex;gap:8px;margin-bottom:var(--cds-gap-sm)}
+@media print{.it-lvl-c,.it-geo-grp td{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.it-geo{table-layout:fixed}.it-geo th:nth-child(1){width:30%}.it-geo th:nth-child(2){width:6.5%}.it-geo-type{max-width:none;min-width:0;white-space:normal;overflow-wrap:anywhere}
+.it-table.it-geo td.it-geo-type{white-space:normal}
+.it-empty{display:flex;gap:14px;align-items:center;border:2px dashed color-mix(in srgb,var(--acc) 40%,var(--color-border-line));border-radius:12px;padding:28px 22px;background:var(--color-bg)}
+.it-empty-ic{flex:none;width:40px;height:40px;border-radius:50%;background:color-mix(in srgb,#EF3025 12%,var(--color-bg));color:#EF3025;font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.it-empty-t{font-weight:var(--cds-font-weight-medium);font-size:var(--cds-font-size-heading)}
+.it-empty-d{color:var(--color-fg-muted);margin-top:2px}
+.it-geo{min-width:68rem}.it-geo th:nth-child(1){width:20%}.it-geo th:nth-child(2){width:24%}.it-geo th:nth-child(3){width:5.5%}.it-geo-mean{font-size:var(--cds-font-size-caption);line-height:1.4;white-space:normal}
+.it-geo .it-lvl{padding:2px 6px;font-size:.66rem}.it-geo-legend .it-lvl{font-size:.72rem;padding:2px 9px}
+.it-geo th:nth-child(1){width:20%}.it-geo th:nth-child(2){width:5.5%}.it-geo th:nth-child(3){width:auto}.it-geo th:nth-child(9){width:24%}
+.it-flow.it-flow-phased{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));column-gap:1.6rem;row-gap:.6rem;flex-wrap:nowrap}
+.it-phase{display:flex;align-items:center;gap:10px;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:#EF3025;grid-row:1}
+.it-phase::after{content:"";flex:1;height:1px;background:color-mix(in srgb,#EF3025 55%,transparent)}
+.it-phase.pub{color:var(--color-fg)}
+.it-phase.pub::after{background:var(--color-border-line)}
+.it-step-phase{display:none}
+.it-step.pub{--s:#B5B3B4}
+.it-step.pub .it-sn{color:#171A21}
+.it-step.pub .it-role{color:var(--color-fg)}
+.it-step-pts{margin:10px 0 0;padding:10px 0 0 1rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);line-height:1.5;color:var(--color-fg-muted)}
+.it-step-pts li{margin-bottom:4px}
+.it-step-pts li::marker{color:var(--s)}
+.it-step.pub .it-step-pts li::marker{color:var(--color-fg)}
+.it-flow-callouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cds-gap-md);margin-top:var(--cds-gap-md)}
+.it-flow-callouts>div{border:1px solid var(--color-border-line);border-radius:8px;padding:10px 14px;font-size:var(--cds-font-size-caption);background:var(--color-bg)}
+.it-flow-callouts b{color:#EF3025}
+@media (max-width:900px){.it-flow.it-flow-phased{grid-template-columns:1fr}.it-phase{display:none}.it-flow.it-flow-phased .it-step{grid-row:auto!important}.it-step-phase{display:block;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:4px}.it-flow-callouts{grid-template-columns:1fr}}
+.it-flow-phased .it-step{--s:#EF3025}.it-flow-phased .it-step.pub{--s:#B5B3B4}.it-flow-phased .it-step .it-role{color:var(--s)}.it-flow-phased .it-step.pub .it-role{color:var(--color-fg)}.it-flow-phased .it-step:not(:last-child)::after{color:#EF3025}
+</style></head>
+<body><div id="dash-root">
+
+<div class="it">
+  <div class="it-hero">
+    <div class="it-hero-top">
+      <span class="it-badge">Internal · Demo prep · Oct 2026</span>
+      <div class="it-switch" role="group" aria-label="Tool">
+        <button type="button" data-tool="itics" aria-pressed="true">ITICS</button>
+        <button type="button" data-tool="cadmin" aria-pressed="false">CAdmin</button>
+        <button type="button" data-tool="indexeq" aria-pressed="false">Index EQ</button>
+        <button type="button" data-tool="ical" aria-pressed="false">ICal</button>
+      </div>
+      <button class="it-print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">Print / save as PDF</button>
+    </div>
+    <h1 id="top">Indxx Thematic Industry Classification System</h1>
+    <p class="it-tag" id="tool-tag">ITICS 3.0: every company mapped by revenue to Sectors, Themes and Sub-themes.</p>
+    <div class="it-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+  <dialog class="it-dlg" id="feat-dlg" aria-labelledby="feat-title">
+    <div class="it-dlg-head"><h3 id="feat-title">Features</h3><button type="button" class="it-dlg-x" aria-label="Close" onclick="this.closest('dialog').close()">×</button></div>
+    <div class="it-dlg-body" id="feat-body"></div>
+  </dialog>
+  <nav class="it-tabbar" role="tablist" aria-label="Sections" id="tabbar"></nav>
+  <div class="it-tool" data-tool="itics">
+  <section class="it-sect" id="overview" role="tabpanel">
+    <div class="it-sect-body">
+      <div class="it-tiles" id="tiles" data-source="itics_facts"></div>
+      <div class="it-grid">
+        <div class="it-card">
+          <h3 id="journey">The journey</h3>
+          <p class="it-note">Three years from first launch to a unified, AI-powered platform.</p>
+          <ol class="it-tl" id="timeline" data-source="itics_timeline"></ol>
+        </div>
+        <div class="it-card">
+          <h3 id="messages">Key Capabilities of ITICS</h3>
+          <ol class="it-msgs" style="margin:0;padding-left:1.2rem;line-height:1.7">
+            <li><b>More Accurate Thematic Classification</b> through revenue-based company mapping.</li>
+            <li><b>Transparent and Controlled Workflows</b> with AI-assisted processing, analyst oversight, and auditability.</li>
+            <li><b>Scalable Data Management</b> through a unified platform and flexible taxonomy framework.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="evolution" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card it-cmp">
+        <p class="it-sub">Automating end-to-end processing of research reports and data integration workflows.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-evo" id="evotable" data-source="itics_evolution" data-row-key="area">
+            <thead><tr><th data-field="area"></th><th data-field="capability">How ITICS Creates Value</th><th data-field="advantage">Advantage</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="platform" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Nothing reaches Golden Data or Golden Copy without Analyst approval. RM oversees master data, assignments and invalidations.</p>
+        <div class="it-flow" id="flowsteps" data-source="itics_workflow"></div>
+        <div class="it-flow-callouts">
+          <div><b>Steps 1–3</b> run end to end with no manual touch</div>
+          <div><b>Step 4</b> is the only gate to Golden Data</div>
+          <div><b>RM invalidation ↺</b> sends a company back to Analyst review</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="modules-sec" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-grid it-modcards" id="modcards" data-source="itics_modules"></div>
+    </div>
+  </section>
+  <section class="it-sect" id="demo" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Keep the backup screen recording open in another tab.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-demotable" id="demotable" data-source="itics_demo" data-row-key="minute">
+            <thead><tr><th data-field="minute">At</th><th data-field="screen">Screen</th><th data-field="say">Say</th><th data-field="show">Show</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="qa" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-filters">
+        <input type="search" id="q-search" placeholder="Search questions and answers" aria-label="Search">
+        <select id="q-cat" aria-label="Category"><option value="">All categories</option></select>
+        <select id="q-like" aria-label="Likelihood"><option value="">Any likelihood</option><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="it-count" id="q-count"></div>
+      <div id="q-list" data-source="itics_qa"></div>
+    </div>
+  </section>
+  </div>
+  <div class="it-tool" data-tool="cadmin" hidden>
+  <section class="it-sect" id="c-overview" role="tabpanel">
+    <div class="it-sect-body">
+      <div class="it-tiles" id="c-tiles" data-source="cadmin_facts"></div>
+      <div class="it-grid">
+        <div class="it-card">
+          <h3 id="c-journey">The journey</h3>
+          <p class="it-note">From a multi-vendor golden copy to a rules-driven SaaS platform.</p>
+          <ol class="it-tl" id="c-timeline" data-source="cadmin_timeline"></ol>
+        </div>
+        <div class="it-card">
+          <h3 id="c-messages">Key Capabilities of CAdmin</h3>
+          <ol class="it-msgs" style="margin:0;padding-left:1.2rem;line-height:1.7">
+            <li><b>Accurate Corporate Action Data</b> through multi-vendor comparison and rules-based auto-approval.</li>
+            <li><b>Controlled, Auditable Workflows</b> with up to 6-eye checks, mandatory reasons and a full audit trail.</li>
+            <li><b>Secure, Scalable SaaS</b> with isolated client environments, configurable universes and AWS hosting.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-geo" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <h3 id="c-geo-h">Corporate action types across geographies</h3>
+        <p class="it-note">Indicative prevalence based on typical market practice; actual frequency varies by market and year. The CAdmin column shows which types are in the CAdmin 2.0 event list.</p>
+        <div class="it-geo-legend"><span class="it-lvl it-lvl-c">Common</span><span class="it-lvl it-lvl-o">Occasional</span><span class="it-lvl it-lvl-r">Rare</span></div>
+        <div class="it-tablewrap">
+          <table class="it-table it-geo" id="c-geotable" data-source="cadmin_ca_geo" data-row-key="type">
+            <thead><tr><th data-field="type">Corporate action</th><th data-field="cadmin">In CAdmin</th><th data-field="na">North America</th><th data-field="eu">Europe &amp; UK</th><th data-field="jp">Japan</th><th data-field="cn">China &amp; Hong Kong</th><th data-field="ind">India</th><th data-field="ap">Other Asia-Pacific</th><th data-field="meaning">What it means</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-evolution" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card it-cmp">
+        <p class="it-sub">Turning conflicting vendor feeds into a single, approved golden copy of corporate actions.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-evo" id="c-evotable" data-source="cadmin_evolution" data-row-key="area">
+            <thead><tr><th data-field="area"></th><th data-field="capability">How CAdmin Creates Value</th><th data-field="advantage">Advantage</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-platform" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Only rule-matched or fully approved corporate actions reach the Golden Copy.</p>
+        <div class="it-flow" id="c-flowsteps" data-source="cadmin_workflow"></div>
+        <div class="it-flow-callouts">
+          <div><b>Steps 1–2</b> approve matching data with no manual touch</div>
+          <div><b>Steps 3–5</b> up to a 6-eye check on every exception</div>
+          <div><b>Pullback ↺</b> any vendor change reopens review</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-modules-sec" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-grid it-modcards" id="c-modcards" data-source="cadmin_modules"></div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-demo" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Keep the backup screen recording open in another tab.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-demotable" id="c-demotable" data-source="cadmin_demo" data-row-key="minute">
+            <thead><tr><th data-field="minute">At</th><th data-field="screen">Screen</th><th data-field="say">Say</th><th data-field="show">Show</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="c-qa" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-filters">
+        <input type="search" id="c-q-search" placeholder="Search questions and answers" aria-label="Search">
+        <select id="c-q-cat" aria-label="Category"><option value="">All categories</option></select>
+        <select id="c-q-like" aria-label="Likelihood"><option value="">Any likelihood</option><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="it-count" id="c-q-count"></div>
+      <div id="c-q-list" data-source="cadmin_qa"></div>
+    </div>
+  </section>
+  </div>
+  <div class="it-tool" data-tool="indexeq" hidden>
+  <section class="it-sect" id="x-overview" role="tabpanel">
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Overview</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  <section class="it-sect" id="x-evolution" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Index EQ Transformation</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  <section class="it-sect" id="x-platform" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Index EQ Workflow</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  <section class="it-sect" id="x-modules-sec" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Index EQ Tool Features</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  <section class="it-sect" id="x-demo" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Demo Flow</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  <section class="it-sect" id="x-qa" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-empty"><div class="it-empty-ic">+</div><div><div class="it-empty-t">Question & Answer</div><div class="it-empty-d">Content for Index EQ will appear here once the source material (specification, notes or screenshots) is shared.</div></div></div>
+    </div>
+  </section>
+  </div>
+<div class="it-tool" data-tool="ical" hidden>
+  <section class="it-sect" id="k-overview" role="tabpanel">
+    <div class="it-sect-body">
+      <div class="it-tiles" id="k-tiles" data-source="ical_facts"></div>
+      <div class="it-grid">
+        <div class="it-card">
+          <h3 id="k-journey">The journey</h3>
+          <p class="it-note">From detailed requirements to a fully automated calculation engine.</p>
+          <ol class="it-tl" id="k-timeline" data-source="ical_timeline"></ol>
+        </div>
+        <div class="it-card">
+          <h3 id="k-messages">Key Capabilities of ICal</h3>
+          <ol class="it-msgs" style="margin:0;padding-left:1.2rem;line-height:1.7">
+            <li><b>Accurate, Flexible Index Calculation</b> across PR, TR, NTR and TPR versions, divisor and non-divisor methods, and client-specific tax rates.</li>
+            <li><b>Complete Corporate Action Handling</b> including late dividends, partial deals, theoretical prices and multiple spin-offs.</li>
+            <li><b>Controlled Operations &amp; Recovery</b> with automated comparisons, Admin approvals and one-click backup and restatement.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="k-evolution" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card it-cmp">
+        <p class="it-sub">Automating index calculation, corporate action adjustments and file delivery end to end.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-evo" id="k-evotable" data-source="ical_evolution" data-row-key="area">
+            <thead><tr><th data-field="area"></th><th data-field="capability">How ICal Creates Value</th><th data-field="advantage">Advantage</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="k-platform" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Nothing reaches clients without passing automated checks. Admin approves critical changes.</p>
+        <div class="it-flow" id="k-flowsteps" data-source="ical_workflow"></div>
+        <div class="it-flow-callouts">
+          <div><b>Steps 1–3</b> run automatically, with alerts on any exception</div>
+          <div><b>Step 4</b> Admin approval for critical changes</div>
+          <div><b>Backup ↺</b> regenerates every file from any point</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="k-modules-sec" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-grid it-modcards" id="k-modcards" data-source="ical_modules"></div>
+    </div>
+  </section>
+  <section class="it-sect" id="k-demo" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-card">
+        <p class="it-note">Keep the backup screen recording open in another tab.</p>
+        <div class="it-tablewrap">
+          <table class="it-table it-demotable" id="k-demotable" data-source="ical_demo" data-row-key="minute">
+            <thead><tr><th data-field="minute">At</th><th data-field="screen">Screen</th><th data-field="say">Say</th><th data-field="show">Show</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="it-sect" id="k-qa" role="tabpanel" hidden>
+    <div class="it-sect-body">
+      <div class="it-filters">
+        <input type="search" id="k-q-search" placeholder="Search questions and answers" aria-label="Search">
+        <select id="k-q-cat" aria-label="Category"><option value="">All categories</option></select>
+        <select id="k-q-like" aria-label="Likelihood"><option value="">Any likelihood</option><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="it-count" id="k-q-count"></div>
+      <div id="k-q-list" data-source="ical_qa"></div>
+    </div>
+  </section>
+  </div>
+  </section>
+  </div>
+</div>
+
+</div>
+<script>
+const DATA = {"itics_facts": [{"metric": "Companies in universe (downloadable by year, with segment revenue)", "value": 18000, "display": "18,000+", "version": "3.0", "source": "Kavita"}, {"metric": "Sectors", "value": 11, "display": "11", "version": "3.0", "source": "Kavita"}, {"metric": "Themes", "value": 50, "display": "50+", "version": "1.0", "source": "ITICS 1.0 Project Brief"}, {"metric": "Sub-themes", "value": 650, "display": "650+", "version": "1.0", "source": "Kavita"}, {"metric": "Modules in one application", "value": 9, "display": "9", "version": "3.0", "source": "Kavita"}, {"metric": "User roles (Analyst, RM)", "value": 2, "display": "2", "version": "3.0", "source": "Kavita"}], "itics_timeline": [{"date": "2023-09-01", "label": "Sep 2023", "event": "ITICS 1.0 launched", "detail": "Multi-thematic classification with Analyst → QC → Committee review."}, {"date": "2026-09-01", "label": "Sep 2026", "event": "ITICS 3.0 launched", "detail": "Powered by AI"}], "itics_evolution": [{"area": "Research automation", "capability": "Annual reports fetched and processed automatically; revenue extracted and mapped to Sector, Themes and Sub-themes", "advantage": "Far less manual research as the universe grows", "to_verify": false}, {"area": "Coverage", "capability": "18,000+ company universe with segment revenue, downloadable by year", "advantage": "Screen the whole universe for thematic exposure", "to_verify": false}, {"area": "Source traceability", "capability": "Annual report shown beside the data; each revenue line links to its page in the report", "advantage": "Every number traceable to its source", "to_verify": false}, {"area": "Smart assignment", "capability": "Companies auto-assigned to Analyst; RM can override or reassign in bulk", "advantage": "Work flows without manual allocation", "to_verify": false}, {"area": "Corporate actions", "capability": "AI-enabled workflow: CAs flow in automatically from CAdmin → Analyst reviews and accepts each one → applied to the security; Analysts add any CA that CAdmin missed", "advantage": "Accurate through identifier and name changes, bankruptcies, delistings and M&A", "to_verify": false}, {"area": "Audit trail", "capability": "Immutable log of every add, update, submit, approve, reject and invalidate, never deleted", "advantage": "Full traceability for governance and regulators", "to_verify": false}, {"area": "Golden Data control", "capability": "Version history per company; RM can invalidate a company or a single year for rework", "advantage": "Corrections handled cleanly, history preserved", "to_verify": false}, {"area": "Data validation", "capability": "100% revenue check, one Final Sector per company per year, no future dates", "advantage": "Errors blocked before submission", "to_verify": false}, {"area": "Taxonomy", "capability": "Sector, Themes and Sub-themes with newly mapped codes, managed directly by RM with bulk upload", "advantage": "Clean, consistent classification hierarchy", "to_verify": false}, {"area": "Platform", "capability": "One role-based web app: Dashboard, Automation Console, Screener, Golden Data, Data Management, ITICS Workbench, Corporate Actions, Reports, Audit Trail", "advantage": "One source of truth, no hand-offs between tools", "to_verify": false}, {"area": "Visibility & reports", "capability": "Live dashboard with workload, coverage and sector graphs; Golden Data, Master, Audit, Complete and Daily reports", "advantage": "Real-time status and self-serve exports", "to_verify": false}], "itics_modules": [{"order": 1, "module": "Dashboard", "what": "Universe, Golden Data, Pending and Inactive counts, plus workflow status, company assignment, client reports summary, year-wise coverage and sector distribution", "users": "All roles", "demo": "Open here: the whole operation at a glance", "features": [{"name": "Company counts", "desc": "Headline counts of companies in the Universe, in Golden Data, Pending and Inactive."}, {"name": "Workflow status", "desc": "Company count at each role level in the workflow."}, {"name": "Companies assignment", "desc": "Company count by team member for the RM, and by user for each Analyst.", "note": "In Review: manual entries created by one Analyst go to a second Analyst for review."}, {"name": "Year-wise coverage", "desc": "Company coverage count for each year.", "examples": [{"label": "2017", "value": "14,133"}, {"label": "2025", "value": "17,631"}]}, {"name": "Sector distribution", "desc": "Companies in the Golden Copy by ITICS sector definition, from 2017 to date."}, {"name": "Client reports summary", "desc": "Today's report generation and delivery status at a glance. Click any card to open Client Reports.", "chips": [{"t": "Generated", "tone": "ok"}, {"t": "Scheduled", "tone": "info"}, {"t": "Delivered", "tone": "ok"}, {"t": "Delivery Failed", "tone": "fail"}]}]}, {"module": "Automation Console", "what": "Triggers automated annual report downloads from exchanges, with an AI agent searching the web when reports aren't found, and tracks every job", "users": "RM (job triggers)", "access": "Triggering jobs is currently available to the RM role only.", "features": [{"name": "Targeted Download", "desc": "Downloads annual reports for companies that publish them every year, for any single year or year range from 2017 to 2026.", "points": ["Each request triggers a job", "The job searches stock exchanges for the annual reports"]}, {"name": "Agent Download", "desc": "Runs when the targeted search doesn't find a report.", "points": ["An AI agent searches the internet and company websites for the annual report", "For Chinese and Japanese companies, it also searches for semi-annual or quarterly reports"]}, {"name": "Job History", "desc": "Lists every job run with its status.", "chips": ["OK", "Fail", "Skip", "Total"]}], "order": 2}, {"module": "Screener", "what": "Filters companies by name, year, ISIN, Sector, Theme, Sub-theme, country or revenue class, alone or combined, and lists matches with FY end date, revenue % and classification", "users": "RM", "features": [{"name": "Search & filter criteria", "desc": "Filter or search companies by any of these parameters, alone or combined.", "chips": ["Company Name", "Year", "ISIN", "Sector", "Theme", "Sub-Theme", "Country of Incorporation", "Revenue Class"]}, {"name": "Results display", "desc": "Matching companies are listed with these details.", "chips": ["Company Name", "FY Ending Date", "Country of Incorporation", "Sector", "Theme", "Sub-Theme", "Revenue %", "Classification"]}, {"name": "How it works", "desc": "From filters to results in four steps.", "steps": ["User applies one or more search or filter criteria", "System retrieves all matching companies", "Results are shown in a table with the company attributes above", "Users refine the results by combining multiple filters"]}], "order": 3}, {"order": 4, "module": "Data Management", "what": "Search and view companies, Sectors, Themes and Sub-themes; RM adds them singly or in bulk, and edits or soft-deletes them with a recorded reason", "users": "All roles (add, edit, delete: RM)", "demo": "Show the Sector page and a bulk upload template", "features": [{"name": "Companies", "desc": "Find and review any company in the universe.", "points": ["Search companies by name, ISIN, ticker, SEDOL or country", "View complete company details"], "roles": [{"role": "RM", "points": ["Add companies in bulk with [[Upload]] or one at a time with [[Add Company]]", "Edit or delete company details with a recorded reason; deletions are soft deletes, so data is never lost from the database"]}]}, {"name": "Levels", "desc": "Browse the classification hierarchy.", "points": ["View Sectors, Themes and Sub-themes with their code, name and description", "Search by name, code or the user who added them"], "roles": [{"role": "RM", "points": ["Add Sectors, Themes and Sub-themes in bulk with [[Upload]] or one at a time with [[Add Sector]] [[Add Theme]] [[Add Sub-theme]]", "Edit or delete them with a recorded reason; deletions are soft deletes, so data is never lost from the database"]}]}]}, {"order": 5, "module": "ITICS Workbench", "what": "Assignment and monitoring view: search, filter and sort company records, and track update type, processing status and automation status; RM manages Analyst assignments", "users": "Analyst, RM (assignments: RM)", "demo": "Open a company: annual report beside auto-populated data", "purpose": ["Search and filter company coverage records", "Monitor annual report update activity", "Track automation execution status", "Manage Analyst ownership and assignments", "Review completion status across companies"], "features": [{"name": "Search, filter & sort", "desc": "Find any company record fast.", "groups": [{"label": "Search by", "chips": ["Company Name", "Ticker", "ISIN", "SEDOL", "Analyst Email"]}, {"label": "Sort by", "chips": ["Company Name", "Ticker", "ISIN", "SEDOL", "Status"]}, {"label": "Column filters", "chips": ["Update Type", "Status", "Automation Status"]}], "points": ["[[Country]] dropdown filter, defaulting to All Countries", "[[Status]] dropdown filter, defaulting to All Statuses"]}, {"name": "Company grid", "desc": "A scrollable results grid built for large data sets, showing for each company:", "chips": ["Company Name", "Ticker", "ISIN", "SEDOL", "Update Type", "Status", "Automation Status", "Analyst Email"]}, {"name": "Status tracking", "desc": "Every record shows where it stands.", "groups": [{"label": "Update type", "chips": [{"t": "Annual Report Update", "tone": "info"}, {"t": "Fresh", "tone": "info"}]}, {"label": "Processing status", "chips": [{"t": "Completed", "tone": "ok"}, {"t": "Pending Analyst", "tone": "warn"}, {"t": "Review Analyst", "tone": "info"}]}, {"label": "Automation status", "chips": [{"t": "Triggered", "tone": "info"}, {"t": "New Data", "tone": "warn"}, {"t": "Resolved", "tone": "ok"}]}]}, {"name": "Assignment & ownership", "desc": "Clear ownership for every company, managed by the RM.", "roles": [{"role": "RM", "points": ["Assign or reassign companies to Analysts with [[Manage Assignments]]", "See the email of the assigned Analyst on each record"]}]}]}, {"order": 6, "module": "Golden Data", "what": "Centralized security master of approved company data: search, filter and sort identifiers, track FY ending and annual report dates, open corrections and delete records", "users": "RM", "demo": "Search a well-known large-cap name; download the universe", "purposeLabel": "Business benefits", "purpose": ["Single source of truth for security master data", "Faster search and validation of company identifiers", "Better data quality through correction workflows", "Clear tracking of annual report publication timelines", "Efficient management of global company reference data"], "features": [{"name": "Search, filter & sort", "desc": "Find any company record in seconds.", "groups": [{"label": "Search by", "chips": ["Company Name", "Ticker", "SEDOL", "ISIN"]}, {"label": "Filter by", "chips": ["Country", "Record Status"]}, {"label": "Sort by", "chips": ["Company Name", "Ticker", "ISIN", "SEDOL", "FY Ending Date", "AR Published Date"]}]}, {"name": "Centralized security master", "desc": "One repository for company master data, keeping Company Name, Ticker, ISIN and SEDOL mapped together. The grid shows:", "chips": ["Company Name", "Ticker", "ISIN", "SEDOL", "FY Ending Date", "AR Published Date"]}, {"name": "Annual report tracking", "desc": "Keeps reporting timelines visible.", "points": ["Tracks annual report publication dates", "Tracks each company's financial year-ending date", "Highlights records that need an update or correction"]}, {"name": "Corrections & record management", "desc": "Keeps the repository accurate and clean.", "points": ["Review and fix incorrect or missing information with [[Open Correction]] on any record", "Delete individual records to maintain the Golden Data repository"]}], "access": "The Golden Data module is available to the RM role only."}, {"order": 7, "module": "Corporate Actions", "what": "View, search and download corporate actions for ITICS companies, from identifier and name changes to bankruptcy, delisting and M&A; Analysts add any CA that CAdmin missed", "users": "All roles (add CA: Analyst)", "demo": "Refresh CAs and validate one into Golden Copy", "features": [{"name": "CA Handling", "desc": "View details of corporate actions for every company in ITICS, covering these event types:", "chips": ["ISIN change", "Company Name change", "SEDOL change", "Ticker change", "Bankruptcy", "Delisting", "Merger", "Acquisition", "Takeover"], "points": ["Search by Company Name or ISIN, date range and CA type", "Download all corporate actions in one go"], "roles": [{"role": "Analyst", "points": ["Add any corporate action the Analyst comes across that the CAdmin tool has missed", "Views only the corporate actions linked to companies assigned to them", "Accepts each corporate action, whether fetched from CAdmin or added manually, before it is applied to the security"]}]}]}, {"order": 8, "module": "Reports", "what": "Golden Data, Master Data, Audit, Utility, Complete and Daily reports by date range", "users": "Super Admin", "demo": "Download a Daily Report", "children": [{"module": "Internal Reports", "what": "Generate custom-filtered internal reports, then search, track and download them with full metadata", "purposeLabel": "Business purpose", "purpose": ["Generate targeted datasets with business-specific filters", "Reduce manual data extraction effort", "Improve reporting efficiency", "Keep every report traceable and auditable"], "features": [{"name": "Generate report", "desc": "Create a customised report of companies that match your filters, under Reports → Internal Reports → Generate.", "groups": [{"label": "Custom filters", "chips": ["Label (optional)", "Report Type", "Sectors / Themes / Sub-themes", "Countries", "Years", "Revenue Min", "Revenue Max"]}], "flow": ["Select Custom Filters", "Add label & report type", "Apply business filters", "Generate", "Ready under Download"]}, {"name": "Download & track", "desc": "Every generated report is stored with its details, ready to download.", "groups": [{"label": "Search by", "chips": ["Report Name"]}, {"label": "Filter by", "chips": ["Start Date", "End Date"]}, {"label": "Report details", "chips": ["Report Name", "Label", "Report Type", "File Size", {"t": "Status", "tone": "ok"}, "Created By", "Created At", "Generated At"]}], "points": ["Download any completed report at any time from the [[Download]] tab"]}, {"name": "Audit & traceability", "desc": "Each request leaves a clear record.", "points": ["Tracks who created each report, when it was requested and when generation finished", "Shows the status of every report, from request to completion"]}]}, {"module": "Client Reports", "what": "Generate client reports on demand, deliver them automatically by SFTP or email, track every run, and refresh client data through validated templates", "purposeLabel": "Business benefits", "purpose": ["Centralized client report management", "Complete audit trail for every report", "Visibility into delivery successes and failures", "Manual and scheduled report generation", "Distribution through SFTP, email and other channels", "Faster troubleshooting with execution history"], "features": [{"name": "Reports List", "desc": "Every client report with its generation and delivery history, from run to delivery and download.", "groups": [{"label": "Search & filter", "chips": ["Report Name", "Date range"]}, {"label": "Columns", "chips": ["Report Name", "Client Name", "Trigger", "Run Date", "Status", "Attempts", "Delivery Status", "Delivery Target", "Delivered At", "Created By", "Created At", "Generated At", "Action"]}, {"label": "Trigger", "chips": [{"t": "All", "tone": "muted"}, {"t": "Manual", "tone": "info"}, {"t": "Scheduled", "tone": "info"}]}, {"label": "Generation status", "chips": [{"t": "All", "tone": "muted"}, {"t": "Success", "tone": "ok"}, {"t": "Pending", "tone": "warn"}, {"t": "Failed", "tone": "fail"}]}, {"label": "Delivery status", "chips": [{"t": "All", "tone": "muted"}, {"t": "Delivered", "tone": "ok"}, {"t": "Pending", "tone": "warn"}, {"t": "Failed", "tone": "fail"}, {"t": "Skipped", "tone": "muted"}]}, {"label": "Delivery target", "chips": ["SFTP", "Email"]}], "points": ["View execution details and download any report from the Action column"]}, {"name": "Generate Report", "desc": "Produce client-specific reports on demand, under Reports → Client Reports → Generate.", "groups": [{"label": "Options", "chips": ["Report Type (e.g. Daily, Complete)", "Clients (one or more)", "Deliver to Client"]}], "flow": ["Choose report type", "Select client(s)", "Tick Deliver to Client", "Generate", "Track in Reports List"], "points": ["With [[Deliver to Client]] selected, the report goes straight to each client's configured destination by SFTP, email or another channel", "Every run records generation and delivery status, run date, timestamps, attempts and the user who started it"]}, {"name": "Update Data", "desc": "Refresh the client data used in report generation through a standard template, under Reports → Client Reports → Update Data.", "flow": ["Select client", "Download template", "Fill in data", "Upload", "Validated & refreshed"], "groups": [{"label": "Validation checks", "chips": ["Template structure", "Mandatory fields", "Data types", "Duplicate records", "Client business rules"]}], "points": ["If validation fails, the upload is rejected and the errors are shown", "If it passes, the data is updated and every future report uses it"]}]}]}, {"order": 9, "module": "Audit Trail", "what": "Complete record of every user and system action across ITICS: who did what, on which entity and module, and when; searchable, filterable by date and exportable", "users": "RM", "demo": "Filter the trail to the company just shown", "access": "The Audit Trail module is available to the RM role only.", "purposeLabel": "Business benefits", "purpose": ["Complete visibility into system and user activities", "Stronger governance and accountability", "Faster investigation of issues and data changes", "Audit readiness and compliance support", "Detailed record of approvals and workflows"], "features": [{"name": "What gets logged", "desc": "Every key action and the entity it touched.", "groups": [{"label": "Actions", "chips": [{"t": "Create", "tone": "ok"}, {"t": "Update", "tone": "info"}, {"t": "Approve", "tone": "ok"}, {"t": "Accept Extraction", "tone": "info"}, {"t": "Export / Download", "tone": "muted"}, {"t": "Invalidate", "tone": "fail"}]}, {"label": "Entities", "chips": ["Companies", "Reports", "Golden Data records", "Workbench records"]}]}, {"name": "Who & when", "desc": "Full accountability for every change.", "points": ["Records the user who performed each action, with role-based tracking", "Logs the precise date and time of every activity for historical tracking, compliance checks and operational review"]}, {"name": "End-to-end change tracking", "desc": "Follows each record through its full lifecycle.", "flow": ["Data Extraction", "Data Update", "User Review", "Approval", "Publication"]}, {"name": "Search & date filtering", "desc": "Review activity for any period.", "groups": [{"label": "Search by", "chips": ["Entity Name", "Module", "Action Type", "Keywords"]}, {"label": "Date range", "chips": ["Start Date", "End Date"]}]}, {"name": "Export & compliance", "desc": "Ready for audits and reviews.", "points": ["Download audit logs for reporting, operational reviews and audit requirements", "Tamper-evident activity history that supports internal audits and regulatory compliance", "Greater transparency across business and technology operations"]}]}], "itics_workflow": [{"step": 1, "stage": "AR Downloads", "role": "System", "phase": "Automated by System", "control": "Fetches the latest annual reports for every company in the universe.", "points": ["Picks up new fiscal-year filings automatically", "Stores source documents for traceability", "Flags missing or delayed reports"]}, {"step": 2, "stage": "Extraction", "role": "System", "phase": "Automated by System", "control": "Extracts revenue and segment disclosures from each annual report.", "points": ["Segment-level revenue breakdown", "Normalises currency and fiscal periods", "Links every figure back to its source page"]}, {"step": 3, "stage": "Mapping to Sub-themes", "role": "System", "phase": "Automated by System", "control": "Maps revenue to Sector, Themes and Sub-themes and assigns the company.", "points": ["Revenue share calculated per Sub-theme", "Applies classification rules consistently", "Routes the company to an Analyst queue"]}, {"step": 4, "stage": "Validate & approve", "role": "Analyst", "phase": "Human review", "control": "Corrects or adds classifications; 100% revenue check before approval.", "points": ["Reviews system mapping against the AR", "Revenue must reconcile to 100%", "Approves or sends back for rework"]}, {"step": 5, "stage": "Golden Data", "role": "System", "phase": "Published", "control": "Versioned source of truth; RM can invalidate for rework.", "points": ["Feeds Golden Copy for downstream use", "Every version and change is audited", "Invalidation reopens Step 4"]}], "itics_demo": [{"minute": "0:00", "screen": "Dashboard", "say": "This is the whole ITICS operation on one screen: completed, pending and inactive companies, workload and coverage.", "show": "Status counts and graphs"}, {"minute": "0:20", "screen": "ITICS Workbench", "say": "Companies arrive already assigned. Each one shows whether it's new, an annual update or a correction.", "show": "Queue with Company Type"}, {"minute": "0:40", "screen": "Company Review", "say": "The annual report sits beside the data, themes are pre-filled, and every revenue line links to its source page. The Analyst validates and approves here.", "show": "Click a page number → report jumps to that page"}, {"minute": "1:30", "screen": "Golden Data", "say": "Approved, versioned data for 18,000+ companies, searchable and downloadable by year.", "show": "Company search → Sector, Themes, Sub-themes with revenue split"}, {"minute": "1:50", "screen": "Audit Trail", "say": "Who changed what, when and why, for every action. It can never be deleted.", "show": "Audit log filtered to the company"}], "itics_qa": [{"id": "I01", "category": "Differentiation", "likelihood": "High", "question": "How is ITICS different from GICS or ICB?", "answer": "GICS/ICB put a company in one industry. ITICS is multi-thematic and multi-segment: it maps each business segment's revenue to a Sector, Theme and Sub-theme, across 11 Sectors, 50+ Themes and 650+ Sub-themes.", "proof": "Golden Data record showing the revenue split"}, {"id": "I02", "category": "Methodology", "likelihood": "High", "question": "Where does the revenue data come from?", "answer": "Company annual reports, fetched and processed automatically, plus filings, regulatory disclosures and investor presentations. Each revenue line records the report page it came from.", "proof": "Click a page number on the Company Review page"}, {"id": "I03", "category": "Data quality", "likelihood": "High", "question": "How do you ensure classifications are accurate?", "answer": "Automation extracts and maps data with confidence scores, while analysts validate and approve records before publication. Built-in controls enforce key rules, including 100% revenue allocation, one final sector per company per year, and no future-dated records.", "proof": "Company Review page with the 100% revenue check"}, {"id": "I04", "category": "Governance", "likelihood": "High", "question": "Can you show an audit trail for a classification change?", "answer": "Yes. Every add, update, submit, approve, reject and invalidate is logged with user, role, module, date and comment. The log is immutable and never deleted, and it can be exported.", "proof": "Audit Trail filtered to one company"}, {"id": "I05", "category": "Corporate actions", "likelihood": "High", "question": "What happens to classifications after a merger or spin-off?", "answer": "AI-enabled workflow: corporate actions (name change, ISIN change, delisting, M&A) are ingested automatically from our Indxx Corporate Action Management System (CAdmin) and validated by an Analyst into the Golden Copy. Missed events can be added or bulk uploaded.", "proof": "CA Handling → Golden Copy"}, {"id": "I06", "category": "Delivery", "likelihood": "High", "question": "How would Clients receive the data and how often?", "answer": "Clients can download the full universe for any year, along with Golden Data, Master Data, Complete Reports and Daily Reports filtered by their chosen date range. Delivery is by SFTP or API, whichever the client prefers.", "proof": "Reports module"}, {"id": "I07", "category": "Evolution", "likelihood": "Medium", "question": "What changed from 1.0 to 3.0?", "answer": "Three separate review modules merged into one Workbench\nAutomated annual report processing and assignment\nL1/L2 renamed to Themes and Sub-themes, with a new Sector level\nNew Corporate Actions and Audit Trail modules (CAs were handled in spreadsheets before)", "proof": "ITICS Transformation tab"}, {"id": "I08", "category": "History", "likelihood": "Medium", "question": "Can we get historical classifications for backtesting?", "answer": "Every company is versioned and viewable year by year, and a full year's universe can be downloaded with segment revenue. History is available from 2017, covering approximately 14,000+ companies.", "proof": "Year dropdown on a Golden Data record"}, {"id": "I09", "category": "Flexibility", "likelihood": "Medium", "question": "Can you add themes that matter to us?", "answer": "Yes. RM manages Sectors, Themes and Sub-themes directly, including bulk uploads, with defined rules for merging or retiring Sub-themes so history stays consistent.", "proof": "Levels pages in Data Management"}, {"id": "I10", "category": "Corrections", "likelihood": "Medium", "question": "What if a published classification turns out to be wrong?", "answer": "RM can invalidate a whole company or a single year with a comment. It goes back to the Analyst for rework and re-approval, and the earlier version is kept.", "proof": "Invalidate action in Golden Data"}, {"id": "I11", "category": "Operations", "likelihood": "Medium", "question": "How do you manage workload and turnaround?", "answer": "Companies are auto-assigned to Analysts; RM can reassign in bulk. The dashboard tracks assignments per person, year-wise coverage and sector distribution.", "proof": "Dashboard graphs"}, {"id": "I12", "category": "AI", "likelihood": "Medium", "question": "Is AI used in classification?", "answer": "Yes. The automation engine fetches annual reports, extracts and segments revenue, pre-fills Sector, Themes and Sub-themes and assigns companies. An Analyst still validates and approves every record. The extraction engine is part of the platform: RM users run targeted and AI-agent downloads of annual reports from the Automation Console.", "proof": "Pre-filled Company Review page"}, {"id": "I13", "category": "Scale", "likelihood": "Medium", "question": "Will it perform at our scale?", "answer": "Built for the full universe with many concurrent users; screens respond within 2 seconds, with loading indicators on large data sets.", "proof": "Live navigation during the demo"}, {"id": "I14", "category": "Security", "likelihood": "Medium", "question": "Who can see and change what?", "answer": "Role-based access with two roles: Analyst and RM. Each sees only permitted modules and actions. Critical RM actions require a comment.", "proof": "Role-specific views"}, {"id": "I15", "category": "Commercial", "likelihood": "Medium", "question": "How would we use this commercially?", "answer": "Route 1: Access the platform as a SaaS product\nRoute 2: License the Golden Data to feed thematic and smart-beta indexes", "proof": "Commercial model: confirm"}], "cadmin_facts": [{"metric": "Corporate action event types (in 8 groups)", "value": 16, "display": "16", "source": "CAdmin Specification Document V2.0.3"}, {"metric": "Validation rules in the rules engine", "value": 14, "display": "14", "source": "CAdmin Specification Document V2.0.3"}, {"metric": "Modules in one application", "value": 14, "display": "14", "source": "CAdmin Specification Document V2.0.3"}, {"metric": "Vendor feeds (FactSet, EDI)", "value": 2, "display": "2", "source": "Kavita"}, {"metric": "Approval levels (up to 6-eye check)", "value": 3, "display": "3", "source": "CAdmin Specification Document V2.0.3"}, {"metric": "User roles (Analyst, QC, Admin)", "value": 3, "display": "3", "source": "CAdmin Specification Document V2.0.3"}], "cadmin_timeline": [{"date": "", "label": "Date to confirm", "event": "CAdmin 1.0 launched", "detail": "Multi-vendor golden copy with exception handling."}, {"date": "2025-08-28", "label": "Aug 2025", "event": "CAdmin 2.0 specification finalised", "detail": "Rules-based auto-approval, bulk approval, stronger audit trail."}], "cadmin_evolution": [{"area": "Multi-vendor golden copy", "capability": "Ingests corporate actions from multiple vendors, normalises and compares them, and masters matching data straight into a Golden Copy", "advantage": "One trusted version of every corporate action", "to_verify": false}, {"area": "Rules-based auto-approval", "capability": "14 validation rules; when vendors agree, including 2-of-3 vendor consensus, the CA is approved automatically", "advantage": "Analysts only handle true exceptions", "to_verify": false}, {"area": "Exception handling", "capability": "Mismatches flagged with the rule that triggered them and resolved in one screen, with overrides and justification", "advantage": "Faster, documented discrepancy resolution", "to_verify": false}, {"area": "Multi-level approval", "capability": "Up to 6-eye checks: Analyst → QC → Admin before anything reaches the Golden Copy", "advantage": "Every override independently verified", "to_verify": true}, {"area": "Vendor change control", "capability": "Vendor updates or deletes after approval automatically pull the CA back for review", "advantage": "Golden Copy never silently goes stale", "to_verify": false}, {"area": "Event coverage", "capability": "16 event types: dividends, splits, spin-offs, rights, reference-data changes, delistings, acquisitions and takeovers", "advantage": "Full coverage of index-relevant events", "to_verify": false}, {"area": "Manual & bulk CA creation", "capability": "Add corporate actions vendors miss, one at a time or by Excel bulk upload, with approval", "advantage": "No gaps in the event record", "to_verify": false}, {"area": "Audit trail", "capability": "Every action timestamped with user, role, status and comment; reasons mandatory for reject and invalidate", "advantage": "Full traceability for compliance", "to_verify": false}, {"area": "Multi-tenant SaaS", "capability": "Each client gets an isolated subdomain, its own security universe, vendor subscriptions and rules", "advantage": "Configured to each client's needs", "to_verify": false}, {"area": "Security & hosting", "capability": "AWS hosting with Cognito authentication, TLS encryption, separate Dev/QA/UAT/Prod, auto-scaling and disaster recovery", "advantage": "Enterprise-grade security and availability", "to_verify": false}, {"area": "M&A and multiple-CA views", "capability": "Upcoming mergers and acquisitions, and securities with several CAs in one period", "advantage": "Complex events spotted early", "to_verify": false}, {"area": "Reporting & file delivery", "capability": "Dashboards, PDF/Excel reports by date range, vendor and CA type; on-demand file generation and push", "advantage": "Data delivered when the client needs it", "to_verify": false}], "cadmin_modules": [{"order": 1, "module": "Dashboard View", "what": "Charts of corporate action status, vendor coverage and discrepancy trends", "users": "All roles"}, {"order": 2, "module": "Identifier Management", "what": "Builds the client's security universe by ISIN, SEDOL, RIC, MIC, ticker or Indxx ID", "users": "All roles, with approval"}, {"order": 3, "module": "Exception Handling", "what": "Reviews mismatched CAs side by side by vendor, uses AI-powered agentic web search to validate them against issuer announcements, and resolves them with justification", "users": "All roles"}, {"order": 4, "module": "Manual CA", "what": "Creates corporate actions that no vendor reported", "users": "All roles, with approval", "children": [{"module": "Single CA Upload", "what": "Adds one corporate action at a time"}, {"module": "Bulk CA Upload", "what": "Uploads many corporate actions from an Excel file"}]}, {"order": 5, "module": "Golden Copy", "what": "Final approved corporate actions, searchable and downloadable", "users": "All roles"}, {"order": 6, "module": "Multiple CA View", "what": "Securities with more than one corporate action in a period", "users": "All roles"}, {"order": 7, "module": "Bulk Approval", "what": "Approves or rejects many corporate actions in a date range at once", "users": "Reviewers"}, {"order": 8, "module": "M & A", "what": "Upcoming mergers and acquisitions", "users": "All roles"}, {"order": 9, "module": "Report", "what": "Master and Golden Copy reports in PDF or Excel, filtered by date, vendor and CA type", "users": "All roles"}, {"order": 10, "module": "Logs", "what": "Status of the backend jobs fetching corporate actions", "users": "All roles"}], "cadmin_workflow": [{"step": 1, "stage": "Vendor ingestion", "role": "System", "phase": "Automated by System", "control": "Scheduled jobs and APIs pull corporate actions from each vendor and normalise them.", "points": ["One feed per vendor, loaded on schedule", "Vendor formats normalised for comparison", "Logs show the status of every job"]}, {"step": 2, "stage": "Rules engine", "role": "System", "phase": "Automated by System", "control": "Matching data is auto-approved into the Golden Copy; mismatches go to Exception Handling.", "points": ["14 validation rules", "Auto-approval on vendor agreement, incl. 2-of-3 consensus", "Each exception labelled with its rule"]}, {"step": 3, "stage": "Resolve exception", "role": "Analyst", "phase": "Human review", "control": "Compares vendor values, overrides with justification or creates a manual CA.", "points": ["Vendor values side by side", "AI agentic web search checks issuer announcements", "Every override needs a justification"]}, {"step": 4, "stage": "Review", "role": "QC", "phase": "Human review", "control": "Approves or rejects the Analyst's action; rejection requires a comment.", "points": ["Independent second check", "Rejected items go back to the Analyst", "Comment mandatory on rejection"]}, {"step": 5, "stage": "Final approval", "role": "Admin", "phase": "Human review", "control": "Highest authority; approves into the Golden Copy.", "points": ["Final sign-off on every exception", "Bulk approval for a date range", "Completes the 6-eye check"]}, {"step": 6, "stage": "Golden Copy", "role": "System", "phase": "Published", "control": "Approved CAs for reports and files; vendor changes trigger an automatic pullback.", "points": ["Feeds reports and client files", "Vendor updates or deletes reopen review", "Invalidation requires a reason"]}], "cadmin_demo": [{"minute": "0:00", "screen": "Dashboard View", "say": "Every corporate action for your universe at a glance: status, vendor coverage and where vendors disagree.", "show": "Status and discrepancy charts"}, {"minute": "0:20", "screen": "Identifier Management", "say": "Your universe, your identifiers. Add a security and its corporate actions start flowing in.", "show": "Add a security by ISIN and MIC"}, {"minute": "0:40", "screen": "Golden Copy", "say": "When vendors agree, the rules engine approves the event automatically, and shows which rule it used.", "show": "Auto-approved CA with its rule"}, {"minute": "1:00", "screen": "Exception Handling", "say": "When vendors disagree, analysts see every value side by side and resolve it with a documented reason.", "show": "Mismatch → override with justification"}, {"minute": "1:30", "screen": "Approval & audit trail", "say": "Nothing goes live without independent review, and every step is recorded.", "show": "Approval chain and audit entries"}, {"minute": "1:50", "screen": "M & A and Reports", "say": "See upcoming mergers early and pull a report by date, vendor or event type.", "show": "M&A view; report download"}], "cadmin_qa": [{"id": "C01", "category": "Value", "likelihood": "High", "question": "What problem does CAdmin solve?", "answer": "Data vendors often report the same corporate action differently. CAdmin compares every vendor, masters matching data straight into one Golden Copy, and routes only real discrepancies to analysts."}, {"id": "C02", "category": "Vendors", "likelihood": "High", "question": "Which data vendors do you use?", "answer": "FactSet and EDI"}, {"id": "C03", "category": "Accuracy", "likelihood": "High", "question": "How do you decide which vendor is right?", "answer": "A rules engine with 14 rules checks every event. Matching data, including 2-of-3 vendor consensus and minor/major currency corrections, is approved automatically. Anything else goes to Exception Handling, labelled with the rule that triggered it."}, {"id": "C04", "category": "Change control", "likelihood": "High", "question": "What happens if a vendor changes or deletes a CA after approval?", "answer": "CAdmin compares the update with the Golden Copy. If it matches, nothing changes. If it differs, the CA is pulled back to Exception Handling as a pullback for review."}, {"id": "C05", "category": "Governance", "likelihood": "High", "question": "How are manual overrides controlled?", "answer": "Every override needs a justification and passes up to 6-eye checks: Analyst, QC, then Admin. Comments are mandatory for any rejection or invalidation, and every step is in the audit trail."}, {"id": "C06", "category": "Coverage", "likelihood": "High", "question": "Which corporate action types are covered?", "answer": "Dividends: ordinary and special\nSplits and stock dividends, including reverse splits\nSpin-offs, including multiple spin-offs for one security\nRights offers\nReference-data changes: ISIN, name, CUSIP, ticker, listing and RIC\nDelistings, acquisitions and takeovers"}, {"id": "C07", "category": "Security", "likelihood": "High", "question": "Is our data isolated from other clients?", "answer": "Yes. CAdmin is multi-tenant with a dedicated subdomain and strict data isolation per client, AWS Cognito authentication with CAPTCHA, single active session per user, and TLS encryption in transit."}, {"id": "C08", "category": "Universe", "likelihood": "Medium", "question": "Can we use our own security universe?", "answer": "Yes. Identifier Management lets you build and maintain your own universe using ISIN, SEDOL, RIC, MIC, ticker or Indxx ID, with no limit on how many securities you add."}, {"id": "C09", "category": "Delivery", "likelihood": "Medium", "question": "How would Clients receive the data and how often?", "answer": "Golden Copy downloads, plus PDF and Excel reports filtered by date window (T-30 to T+30), vendor and event type. Files can be generated and pushed to client servers on demand."}, {"id": "C10", "category": "Events", "likelihood": "Medium", "question": "Can we see complex or upcoming events early?", "answer": "Yes. The M & A module shows upcoming mergers and acquisitions, and Multiple CA View lists securities with several corporate actions in the same period."}, {"id": "C11", "category": "Hosting", "likelihood": "Medium", "question": "Where is it hosted and how available is it?", "answer": "On AWS, with separate Dev, QA, UAT and Production environments, auto-scaling, load balancing and disaster recovery."}, {"id": "C12", "category": "AI", "likelihood": "Medium", "question": "Is AI used?", "answer": "Yes. AI-powered agentic web search automatically identifies and validates corporate actions from issuer announcements, presenting the results in a structured format for analyst review and approval."}, {"id": "C13", "category": "Timeliness", "likelihood": "Medium", "question": "How quickly do vendor updates appear?", "answer": "Vendor data loads through scheduled jobs, and the Logs module shows each job's status. Instant triggers for new and updated corporate actions are planned."}, {"id": "C14", "category": "Integration", "likelihood": "Medium", "question": "Does CAdmin work with other Indxx tools?", "answer": "Yes. ITICS pulls corporate actions from CAdmin automatically, so thematic classifications stay correct through name changes, ISIN changes, delistings and M&A."}, {"id": "C15", "category": "Commercial", "likelihood": "Medium", "question": "How would we use this commercially?", "answer": "Offered as a multi-tenant SaaS platform with a dedicated subdomain, universe and vendor setup for each client."}], "ical_facts": [{"metric": "Enhancements specified in ICal 5.0", "value": 98, "display": "98", "source": "ICal 5.0 Business Requirement Document"}, {"metric": "Modules in one engine", "value": 5, "display": "5", "source": "ICal 5.0 Business Requirement Document"}, {"metric": "Index versions (PR, TR, NTR, TPR)", "value": 4, "display": "4", "source": "ICal 5.0 Business Requirement Document"}, {"metric": "Forward-looking daily files (T+2 to T+10)", "value": 9, "display": "9", "source": "ICal 5.0 Business Requirement Document"}, {"metric": "Interlinked backup filters", "value": 6, "display": "6", "source": "ICal 5.0 Business Requirement Document"}, {"metric": "FX rate sources, extensible", "value": 3, "display": "3+", "source": "ICal 5.0 Business Requirement Document"}], "ical_timeline": [{"date": "2025-08-08", "label": "Aug 2025", "event": "ICal 5.0 requirements drafted", "detail": "Initial business requirement document and first review round."}, {"date": "2026-04-16", "label": "Apr 2026", "event": "Requirements finalised", "detail": "Second review round completed."}, {"date": "", "label": "Date to confirm", "event": "ICal 5.0 launched", "detail": ""}], "ical_evolution": [{"area": "Corporate action precision", "capability": "Late dividends for Japan and South Korea, partial and full stock deals, theoretical prices for halted targets, multiple acquirers and spin-offs, when-issued spin-off pricing", "advantage": "Index values that reflect the true deal terms", "to_verify": false}, {"area": "Flexible methodologies", "capability": "Divisor and non-divisor indices; PR, TR, NTR and new True Price Return versions; rolling rebalances across several effective dates", "advantage": "Supports bespoke client methodologies", "to_verify": false}, {"area": "Client-specific taxation", "capability": "Index-level withholding tax rates, Australian franking credits, Brazilian interest on capital and REIT rates by country", "advantage": "After-tax returns that match the investor's reality", "to_verify": false}, {"area": "Automated quality checks", "capability": "Comparison reports from input to pre-opening to opening; automatic corporate action checks at setup; spin-off, ECA and zero-value alerts", "advantage": "Errors caught before files go out", "to_verify": false}, {"area": "Backup & restatement", "capability": "Automatic backup regenerates every file from a chosen point, with six interlinked filters and an old-vs-new comparison report", "advantage": "Fast, controlled recovery from bad data", "to_verify": false}, {"area": "Forward-looking files", "capability": "T+2 to T+10 advance files that include scheduled reconstitutions and corporate actions", "advantage": "Clients plan ahead with confidence", "to_verify": false}, {"area": "Governance & approvals", "capability": "Admin approval for ETF mapping and for disabling corporate actions; price uploads restricted by role", "advantage": "Every critical change independently checked", "to_verify": false}, {"area": "FX & pricing accuracy", "capability": "FX matched to the file date, bi-directional and USD cross conversion, extensible FX and price sources, full-precision vendor prices, VWAP", "advantage": "Consistent valuations across currencies", "to_verify": false}, {"area": "Security master automation", "capability": "ISIN and MIC primary-key checks with CAdmin, six colour-coded matching cases, RIC search, IndxxID and ticker change tracking", "advantage": "Clean, traceable security data", "to_verify": false}, {"area": "Index lifecycle & history", "capability": "Original live and review dates, terminated index history, back-tested history uploads, backdated go-live, base ticker grouping", "advantage": "A full record of every index", "to_verify": false}, {"area": "Review & proforma control", "capability": "Manual and backdated opening and closing proformas; delistings in reconstitutions redistributed pro rata", "advantage": "Reconstitutions go live accurately", "to_verify": false}, {"area": "Client-ready delivery", "capability": "Files with or without SEDOL/ISIN, client ISIN formats, RICs in ETF files, multiple calculation zones", "advantage": "Output in each client's format and time zone", "to_verify": false}], "ical_modules": [{"module": "Index Manager", "what": "Set up, calculate and maintain indices: opening, closing, ETF and advance files, flexible methodologies, and ticker and identifier changes", "users": "Analyst, Admin", "features": [{"name": "File generation", "desc": "Every file an index needs, generated reliably.", "points": ["Confirmation pop-up as soon as file generation starts", "ETF files generated on manual go-live too", "T+2 to T+10 advance files, including scheduled reconstitutions", "Monday files can be fetched on Saturday", "One-click pre-opening, opening and go-live for many indices at once"]}, {"name": "Methodologies", "desc": "Configurable per index.", "groups": [{"label": "Calculation", "chips": ["Divisor", "Non-divisor", "Rolling rebalance"]}, {"label": "Versions", "chips": ["PR", "TR", "NTR", "TPR (new)"]}], "points": ["A base ticker groups every variant of the same index", "Client-specific tax rates for NTR versions"]}, {"name": "Quality controls", "desc": "Problems flagged before files go out.", "points": ["Automated comparison reports: input vs pre-opening, pre-opening vs opening", "Alerts for spin-offs and ECAs (acquisitions, mergers, delistings) during setup", "Security additions checked by ISIN and MIC against CAdmin, with six colour-coded cases"]}, {"name": "Lifecycle & history", "desc": "A complete record of every index.", "points": ["Original live date and review dates kept separately", "History kept for terminated indices", "Back-tested index values uploaded and stored", "Backdated go-live for reviews", "Ticker and IndxxID changes recorded with effective dates"]}, {"name": "Client output", "desc": "Files in each client's format.", "points": ["Files with or without SEDOL/ISIN values, per index", "Client ISIN formats, e.g. removing a country prefix, with a mapping log", "RICs included in ETF files", "Extra calculation zones with their own schedules"], "roles": [{"role": "Admin", "points": ["Approves analyst ETF mapping before ETF files are generated"]}]}], "order": 1}, {"module": "Data Manager", "what": "Manage securities, prices, FX rates and tax rates, with validation, flexible sources and role-based uploads", "users": "Analyst, Admin", "features": [{"name": "Security data", "desc": "Find and maintain any security.", "points": ["RIC column and RIC search", "Search by country, index name or index ticker, and download results", "Security names validated on upload, with the exact row and character flagged", "Bulk upload"]}, {"name": "FX & currencies", "desc": "Accurate conversion between any currencies.", "flow": ["Direct rate", "Inverse rate", "Cross via USD", "Last available rate"], "points": ["Bi-directional conversion calculated automatically", "Search rates by from-currency, to-currency and date", "Correct handling of Kuwaiti dinar and fils prices"]}, {"name": "Pricing & sources", "desc": "The right price from the right source.", "groups": [{"label": "Source options", "chips": ["Indxx", "Bloomberg", "Partner calculator", "Combinations", "Future vendors"]}], "points": ["Full-precision vendor prices, no rounding", "VWAP prices uploaded alongside closing prices"], "roles": [{"role": "Admin", "points": ["Only authorised roles can upload security prices"]}]}, {"name": "Tax rates", "desc": "Tax treatment per index.", "points": ["Specific tax rates per index, e.g. 15% or 0% for US securities", "Tax rate files downloadable for checking"]}], "order": 2}, {"module": "Customized Index Level Adjustment", "what": "Corporate action handling: dividends and tax, acquisitions, spin-offs and automated CA checks, with Admin approval for overrides", "users": "Analyst, Admin", "features": [{"name": "Dividends & tax", "desc": "Market-specific dividend treatment.", "points": ["Late dividends for Japan and South Korea applied as delta points, without restating history", "Brazilian interest on capital taxed separately from ordinary dividends", "Australian franking credits and conduit foreign income reduce the effective tax rate", "REIT withholding rates by country", "Previous FX rate used when the exchange is closed"]}, {"name": "Acquisitions", "desc": "Deal terms reflected exactly.", "points": ["Partial deals adjust both divisor and index value for cash and stock parts", "Theoretical price for halted targets: stock term × acquirer price + cash term", "Multiple acquirers for one target", "Security-level market cap updated in full stock deals", "Acquisition data exportable to Excel or CSV"]}, {"name": "Spin-offs", "desc": "Every spin-off scenario covered.", "points": ["Multiple spin-offs from one parent", "Added at the when-issued price, with the parent price adjusted", "Shares recalculated on the effective date if parent shares change", "Spin-offs already in the index and spin-offs in proformas handled"]}, {"name": "Automated checks", "desc": "Nothing missed at setup.", "points": ["Automatic CA check at setup and reconstitution using the vendor feed and CACM, colour-coded in output", "Complete CACM Excel export, including rights offerings and spin-offs", "Same adjusted price at close when a security doesn't trade on the CA date"], "roles": [{"role": "Admin", "points": ["Approves any request to disable a corporate action"]}]}], "order": 3}, {"module": "Index Review", "what": "Reconstitutions and proformas: manual and backdated proformas, backdated go-live and clean handling of delistings", "users": "Analyst", "features": [{"name": "Proforma generation", "desc": "Proformas on demand, for any dates.", "flow": ["Select indices", "Choose date range", "Generate opening & closing proformas"], "points": ["Backdated proformas for past dates", "Backdated go-live for reviews"]}, {"name": "Reconstitution accuracy", "desc": "Reviews go live correctly.", "points": ["Delisted securities removed from proformas with weight redistributed pro rata", "Partner FX rates and prices used in partner proformas, with internal rates as fallback", "One-click pre-opening and opening generation with comparison reports"]}], "order": 4}, {"module": "Backup", "what": "Restate any index from any point: automatic or manual backup, interlinked filters, validation and comparison reports", "users": "Analyst", "features": [{"name": "Automatic & manual backup", "desc": "Regenerate everything from the point data went wrong.", "flow": ["Pick effective date & file type", "Take backup", "Engine regenerates every file to today", "Compare old vs new"], "points": ["Manual mode for step-by-step regeneration", "Review and advance files restated without affecting live files", "Files transferred to the internal location when done"]}, {"name": "Interlinked filters", "desc": "Find exactly the indices to restate.", "groups": [{"label": "Filter by", "chips": ["Zone", "Global / Non-Global", "Currency", "Version", "Client", "Security (Indxx ID, RIC, MIC)"]}], "points": ["Select a calculator to restate all of its indices at once"]}, {"name": "Validation", "desc": "Safe restatements.", "points": ["Alerts for files that weren't generated, are blank or have zero prices", "Pop-up warning for zero price, shares or FX rate before continuing", "Live and backup generation kept apart across zones"]}], "order": 5}], "ical_workflow": [{"step": 1, "stage": "Data intake", "role": "System", "phase": "Automated by System", "control": "Loads prices, FX rates and corporate actions from vendors and CAdmin.", "points": ["Multiple, extensible price and FX sources", "FX rate matched to the file date", "Full-precision vendor prices"]}, {"step": 2, "stage": "Calculation", "role": "System", "phase": "Automated by System", "control": "Applies corporate actions and calculates every index version.", "points": ["PR, TR, NTR and TPR versions", "Divisor and non-divisor methods", "Client-specific tax rates"]}, {"step": 3, "stage": "Pre-opening & checks", "role": "System", "phase": "Automated by System", "control": "Generates pre-opening files and comparison reports.", "points": ["Input vs pre-opening vs opening", "Alerts for CAs, ECAs, spin-offs and zero values", "Advance files from T+2 to T+10"]}, {"step": 4, "stage": "Review & approve", "role": "Analyst, Admin", "phase": "Human review", "control": "Analysts review and adjust; Admin approves critical changes.", "points": ["Admin approval for ETF mapping and disabled CAs", "Manual proformas when needed", "Backup and restatement if data was wrong"]}, {"step": 5, "stage": "File delivery", "role": "System", "phase": "Published", "control": "Opening, closing, proforma and ETF files go to clients.", "points": ["Schedules per calculation zone", "Client formats: SEDOL/ISIN, RICs", "Every file kept for backup"]}], "ical_demo": [{"minute": "0:00", "screen": "Index Manager", "say": "Select several indices and generate pre-opening files with one click; the comparison report is built automatically.", "show": "Multi-index pre-opening + comparison report"}, {"minute": "0:30", "screen": "Customized Adjustment", "say": "A halted acquisition target is removed at its theoretical price, exactly as the deal terms say.", "show": "Theoretical price calculation"}, {"minute": "0:55", "screen": "Late dividends", "say": "Japanese and Korean dividends confirmed after the ex-date are applied without restating history.", "show": "Delta dividend tab"}, {"minute": "1:15", "screen": "Index Review", "say": "Generate opening and closing proformas for any date range, including past dates.", "show": "Manual proforma generation"}, {"minute": "1:35", "screen": "Backup", "say": "If a price was wrong, pick the date, and the engine regenerates every file since, with a comparison report.", "show": "Filters → automatic backup → comparison"}, {"minute": "2:00", "screen": "Advance files", "say": "See the index for each of the next ten days, including scheduled reconstitutions.", "show": "T+2 to T+10 files"}], "ical_qa": [{"id": "K01", "category": "Methodology", "likelihood": "High", "question": "What types of indices can ICal calculate?", "answer": "Price Return, Total Return, Net Total Return and the new True Price Return versions, with divisor or non-divisor methods and rolling rebalances across several effective dates. A base ticker groups all variants of the same index."}, {"id": "K02", "category": "Corporate actions", "likelihood": "High", "question": "How do you handle complex corporate actions?", "answer": "Partial and full stock deals, with cash and stock parts reflected\nTheoretical prices for halted acquisition targets\nMultiple acquirers and multiple spin-offs\nSpin-offs added at the when-issued price\nAutomatic CA checks at setup and reconstitution"}, {"id": "K03", "category": "Dividends", "likelihood": "High", "question": "How are late dividend confirmations handled?", "answer": "For Japan and South Korea, where dividends are confirmed after the ex-date, ICal applies the difference as delta points on the implementation date, without restating historical index levels."}, {"id": "K04", "category": "Tax", "likelihood": "High", "question": "Can tax treatment be client-specific?", "answer": "Yes. Withholding tax rates can be set per index, including Australian franking credits, Brazilian interest on capital and REIT rates by country, so NTR returns match the investor's actual tax position."}, {"id": "K05", "category": "Quality", "likelihood": "High", "question": "How do you stop errors before files go out?", "answer": "Automated comparison reports check input vs pre-opening vs opening values. The engine also alerts on spin-offs, ECAs and zero values, and Admin approval is required for critical changes such as ETF mapping or disabling a corporate action."}, {"id": "K06", "category": "Recovery", "likelihood": "High", "question": "What happens if incorrect data was used?", "answer": "Pick the date where the data went wrong and the engine automatically regenerates every file from that point, with a comparison report of old vs corrected values. Interlinked filters find exactly the affected indices."}, {"id": "K07", "category": "Delivery", "likelihood": "Medium", "question": "Can files match our format and timing?", "answer": "Yes. Files can include or omit SEDOL/ISIN values, apply client ISIN formats, include RICs in ETF files, and run in extra calculation zones with their own schedules."}, {"id": "K08", "category": "Forward view", "likelihood": "Medium", "question": "Can we see upcoming changes in advance?", "answer": "Yes. Advance files from T+2 to T+10 show the index for each future day, including scheduled reconstitutions and corporate actions."}, {"id": "K09", "category": "FX", "likelihood": "Medium", "question": "How are currencies converted?", "answer": "Direct rates first, then inverse rates, then a cross rate through USD, then the last available rate. FX rates always match the file date, and dividends use the previous rate when an exchange is closed."}, {"id": "K10", "category": "History", "likelihood": "Medium", "question": "Do you keep index history?", "answer": "Yes. Original live and review dates, terminated index history, uploaded back-tested values, backdated go-live, and every ticker and IndxxID change with its effective date."}, {"id": "K11", "category": "Reconstitution", "likelihood": "Medium", "question": "How are reconstitutions handled?", "answer": "Proformas can be generated manually for any date range, including past dates. Delistings in a reconstitution are removed with their weight redistributed pro rata, and advance files include the reconstitution from its effective date."}, {"id": "K12", "category": "Partners", "likelihood": "Medium", "question": "Can ICal calculate indices for another index provider?", "answer": "Yes. ICal maps partner securities, uses partner prices and FX rates where required, and can run partner indices in their own calculation zone and schedule."}], "cadmin_ca_geo": [{"type": "Ordinary cash dividend", "group": "Cash distributions", "cadmin": "Yes", "na": "Common", "eu": "Common", "jp": "Common", "cn": "Common", "ind": "Common", "ap": "Common", "note": "US pays mostly quarterly; Japan and Australia semi-annually; Europe, China and India mostly annual or interim", "meaning": "A regular cash payment of profits to shareholders, per share held."}, {"type": "Special dividend", "group": "Cash distributions", "cadmin": "Yes", "na": "Occasional", "eu": "Occasional", "jp": "Rare", "cn": "Occasional", "ind": "Occasional", "ap": "Occasional", "note": "Frequent in Hong Kong and Singapore", "meaning": "A one-off cash payment outside the regular schedule, often from surplus cash or an asset sale."}, {"type": "Scrip dividend / dividend reinvestment", "group": "Cash distributions", "cadmin": "No", "na": "Rare", "eu": "Common", "jp": "Rare", "cn": "Rare", "ind": "Rare", "ap": "Common", "note": "Shares offered instead of cash; widespread in the UK, Europe and Australia", "meaning": "Shareholders can take new shares instead of the cash dividend."}, {"type": "Return of capital", "group": "Cash distributions", "cadmin": "No", "na": "Rare", "eu": "Occasional", "jp": "Rare", "cn": "Rare", "ind": "Rare", "ap": "Occasional", "note": "Switzerland (nominal value repayments) and Australia", "meaning": "The company pays back part of shareholders' original capital, not profits; often reduces the share's nominal value."}, {"type": "Stock dividend / bonus issue", "group": "Stock distributions", "cadmin": "Yes", "na": "Rare", "eu": "Rare", "jp": "Rare", "cn": "Common", "ind": "Common", "ap": "Common", "note": "China A-share bonus issues, India bonus issues, Taiwan stock dividends", "meaning": "Free new shares issued to existing holders in proportion to holdings; the price adjusts down, total value is unchanged."}, {"type": "Stock split", "group": "Capital changes", "cadmin": "Yes", "na": "Common", "eu": "Occasional", "jp": "Common", "cn": "Occasional", "ind": "Common", "ap": "Occasional", "note": "Frequent in the US, Japan and India", "meaning": "Each share is divided into more shares (e.g. 1 into 2); the price falls in proportion, total value is unchanged."}, {"type": "Reverse split / consolidation", "group": "Capital changes", "cadmin": "Yes", "na": "Common", "eu": "Occasional", "jp": "Occasional", "cn": "Occasional", "ind": "Rare", "ap": "Occasional", "note": "US exchange listing rules; small caps in Hong Kong and Australia", "meaning": "Several shares are merged into one (e.g. 10 into 1); the price rises in proportion, often to meet exchange minimums."}, {"type": "Rights issue", "group": "Capital changes", "cadmin": "Yes", "na": "Rare", "eu": "Common", "jp": "Rare", "cn": "Common", "ind": "Common", "ap": "Common", "note": "Europe and Asia; Australian entitlement offers; rare in the US", "meaning": "Existing holders get the right to buy new shares, usually at a discount, in proportion to their holdings."}, {"type": "Spin-off / demerger", "group": "Reorganisations", "cadmin": "Yes", "na": "Common", "eu": "Common", "jp": "Occasional", "cn": "Occasional", "ind": "Common", "ap": "Occasional", "note": "US spin-offs, European and Indian demergers", "meaning": "Part of a company is separated into a new listed company, with its shares given to existing holders."}, {"type": "Merger / acquisition / takeover", "group": "Reorganisations", "cadmin": "Yes", "na": "Common", "eu": "Common", "jp": "Common", "cn": "Common", "ind": "Common", "ap": "Common", "note": "UK schemes of arrangement, Japanese tender offers (TOB), US mergers and tender offers", "meaning": "One company combines with or buys another, paid in cash, shares or both; the target usually delists."}, {"type": "ISIN, name, ticker, listing and RIC changes", "group": "Reference data", "cadmin": "Yes", "na": "Common", "eu": "Common", "jp": "Common", "cn": "Common", "ind": "Common", "ap": "Common", "note": "Found in every market; CUSIP changes apply to the US and Canada only", "meaning": "The security's identifiers, name or listing venue change; the holding itself is unchanged, but every system must update its records."}, {"type": "Delisting", "group": "Exits", "cadmin": "Yes", "na": "Common", "eu": "Common", "jp": "Common", "cn": "Common", "ind": "Common", "ap": "Common", "note": "Follows takeovers, voluntary exits or regulatory action", "meaning": "The security is removed from the exchange and stops trading there."}, {"type": "Bankruptcy / insolvency", "group": "Exits", "cadmin": "No", "na": "Occasional", "eu": "Occasional", "jp": "Occasional", "cn": "Occasional", "ind": "Occasional", "ap": "Occasional", "note": "Usually ends in a delisting", "meaning": "The company cannot pay its debts and enters a legal process; shares may be suspended, become worthless and be delisted."}]};
+window.dash = { data: (n) => DATA[n] ? { status: 'ok', data: DATA[n] } : { status: 'error', data: [] }, onData: (cb) => cb(), setLink: (id) => { try { history.replaceState(null, '', '#' + id); } catch (e) {} } };
+</script>
+<script>
+const TOOLS = {
+  itics: { p: '', ds: 'itics', name: 'ITICS', title: 'Indxx Thematic Industry Classification System', tag: 'ITICS 3.0: every company mapped by revenue to Sectors, Themes and Sub-themes.' },
+  cadmin: { p: 'c-', ds: 'cadmin', secs: [['overview', 'Overview'], ['geo', 'CA Types by Region'], ['evolution', '{N} Transformation'], ['platform', '{N} Workflow'], ['modules-sec', '{N} Tool Features'], ['demo', 'Demo Flow'], ['qa', 'Question & Answer']], name: 'CAdmin', title: 'Indxx Corporate Action Management System', tag: 'CAdmin 2.0: one approved golden copy of corporate actions from multiple vendors.' },
+  indexeq: { p: 'x-', ds: 'indexeq', placeholder: true, name: 'Index EQ', title: 'Index EQ', tag: 'Index EQ: details to be added.' },
+  ical: { p: 'k-', ds: 'ical', name: 'ICal', title: 'Indxx Calculation Engine', tag: 'ICal 5.0: index calculation with automated client file delivery.' }
+};
+const SECS = [['overview', 'Overview'], ['evolution', '{N} Transformation'], ['platform', '{N} Workflow'], ['modules-sec', '{N} Tool Features'], ['demo', 'Demo Flow'], ['qa', 'Question & Answer']];
+let curTool = 'itics';
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const mk = (e, src, f, row) => { e.dataset.source = src; e.dataset.field = f; e.dataset.row = String(row); return e; };
+const failed = (box, d) => { if (d.status === 'error') box.appendChild(el('div', 'it-note', 'Failed to load')); };
+const $ = (id) => document.getElementById(id);
+
+function showTab(sec) {
+  const T = TOOLS[curTool];
+  document.querySelectorAll('#tabbar button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sec === sec)));
+  document.querySelectorAll(`.it-tool[data-tool="${curTool}"] section.it-sect`).forEach(s => { s.hidden = s.id !== T.p + sec; });
+  dash.setLink(T.p + sec);
+}
+function setTool(t, sec) {
+  curTool = t; const T = TOOLS[t];
+  document.querySelectorAll('.it-switch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === t)));
+  document.querySelectorAll('.it-tool').forEach(d => { d.hidden = d.dataset.tool !== t; });
+  $('top').textContent = T.title; $('tool-tag').textContent = T.tag;
+  const bar = $('tabbar'); bar.replaceChildren();
+  (T.secs || SECS).forEach(([id, label]) => {
+    const b = el('button', null, label.replace('{N}', T.name));
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.sec = id;
+    b.addEventListener('click', () => showTab(id));
+    bar.appendChild(b);
+  });
+  showTab(sec || 'overview');
+}
+document.querySelectorAll('.it-switch button').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
+
+function renderFacts(T) {
+  const src = T.ds + '_facts', d = dash.data(src), box = $(T.p + 'tiles'); box.replaceChildren();
+  if (d.status !== 'ok') { failed(box, d); return; }
+  d.data.forEach((r, i) => {
+    const t = el('div', 'it-card');
+    t.appendChild(mk(el('div', 'it-lbl', r.metric), src, 'metric', i));
+    t.appendChild(mk(el('div', 'it-num', r.display), src, 'display', i));
+    box.appendChild(t);
+  });
+}
+function renderTimeline(T) {
+  const src = T.ds + '_timeline', d = dash.data(src), box = $(T.p + 'timeline'); box.replaceChildren();
+  if (d.status !== 'ok') { failed(box, d); return; }
+  d.data.forEach((r, i) => {
+    const li = el('li');
+    li.appendChild(el('span', 'it-dot'));
+    li.appendChild(mk(el('div', 'it-date', r.label), src, 'label', i));
+    li.appendChild(mk(el('div', 'it-ev', r.event), src, 'event', i));
+    if (r.detail) li.appendChild(mk(el('div', 'it-det', r.detail), src, 'detail', i));
+    box.appendChild(li);
+  });
+}
+function fillTable(id, src, cols, cls) {
+  const d = dash.data(src), tb = document.querySelector('#' + id + ' tbody'); tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach(r => {
+    const tr = el('tr', r.to_verify ? 'it-flag' : null);
+    cols.forEach(c => tr.appendChild(el('td', cls && cls[c] ? cls[c] : null, r[c])));
+    tb.appendChild(tr);
+  });
+}
+function renderFlow(T) {
+  const src = T.ds + '_workflow', d = dash.data(src), box = $(T.p + 'flowsteps'); box.replaceChildren();
+  if (d.status !== 'ok') { failed(box, d); return; }
+  const phased = d.data.some(r => r.phase);
+  box.classList.toggle('it-flow-phased', phased);
+  if (phased) {
+    box.style.setProperty('--n', d.data.length);
+    let i = 0;
+    while (i < d.data.length) {
+      let j = i; while (j < d.data.length && d.data[j].phase === d.data[i].phase) j++;
+      const ph = el('div', 'it-phase' + (d.data[i].phase === 'Published' ? ' pub' : ''));
+      ph.style.gridColumn = (i + 1) + ' / ' + (j + 1);
+      ph.appendChild(mk(el('span', null, d.data[i].phase), src, 'phase', i));
+      box.appendChild(ph); i = j;
+    }
+  }
+  d.data.forEach((r, i) => {
+    const s = el('div', 'it-step' + (r.phase === 'Published' ? ' pub' : ''));
+    if (phased) s.style.gridRow = '2';
+    if (r.phase) s.appendChild(mk(el('div', 'it-step-phase', r.phase), src, 'phase', i));
+    s.appendChild(mk(el('div', 'it-sn', 'Step ' + r.step), src, 'step', i));
+    s.appendChild(mk(el('div', 'it-st', r.stage), src, 'stage', i));
+    s.appendChild(mk(el('div', 'it-role', r.role), src, 'role', i));
+    s.appendChild(mk(el('div', 'it-ctl', r.control), src, 'control', i));
+    if (r.points) { const ul = el('ul', 'it-step-pts'); r.points.forEach(t => ul.appendChild(el('li', null, t))); s.appendChild(ul); }
+    box.appendChild(s);
+  });
+}
+function renderModules(T) {
+  const src = T.ds + '_modules', d = dash.data(src), box = $(T.p + 'modcards'); box.replaceChildren();
+  if (d.status !== 'ok') { failed(box, d); return; }
+  d.data.forEach((r, i) => {
+    const c = el('div', 'it-card it-mod');
+    if (r.features && r.features.length) {
+      const h = el('h3');
+      const a = mk(el('button', 'it-modlink', r.module), src, 'module', i);
+      a.type = 'button'; a.setAttribute('aria-haspopup', 'dialog');
+      a.appendChild(el('span', 'it-modlink-ic', '↗'));
+      a.addEventListener('click', () => openFeatures(r, src, i));
+      h.appendChild(a); c.appendChild(h);
+    } else c.appendChild(mk(el('h3', null, r.module), src, 'module', i));
+    const dl = el('dl');
+    [['What it does', 'what'], ['Who uses it', 'users']].forEach(([l, f]) => {
+      dl.appendChild(el('dt', null, l)); dl.appendChild(mk(el('dd', null, r[f]), src, f, i));
+    });
+    if (r.children && r.children.length) {
+      const sub = el('div', 'it-subs');
+      sub.appendChild(el('div', 'it-subs-h', 'Includes'));
+      r.children.forEach(k => {
+        const it = el('div', 'it-sub-item');
+        if (k.features && k.features.length) {
+          const nm = el('div', 'it-sub-name');
+          const lk = el('button', 'it-modlink it-sublink', k.module);
+          lk.type = 'button'; lk.setAttribute('aria-haspopup', 'dialog');
+          lk.appendChild(el('span', 'it-modlink-ic', '↗'));
+          lk.addEventListener('click', () => openFeatures(k));
+          nm.appendChild(lk); it.appendChild(nm);
+        } else it.appendChild(el('div', 'it-sub-name', k.module));
+        it.appendChild(el('div', 'it-sub-what', k.what));
+        sub.appendChild(it);
+      });
+      dl.appendChild(sub);
+    }
+    c.appendChild(dl); box.appendChild(c);
+  });
+}
+function richText(node, t) {
+  t.split(/(\[\[.*?\]\])/).forEach(part => {
+    if (part.startsWith('[[')) node.appendChild(el('span', 'it-ui-btn', part.slice(2, -2)));
+    else if (part) node.appendChild(document.createTextNode(part));
+  });
+}
+function chipRow(chips) {
+  const cw = el('div', 'it-feat-chips');
+  chips.forEach(c => {
+    const t = typeof c === 'string' ? c : c.t;
+    let tone = typeof c === 'string' ? '' : c.tone;
+    if (!tone && ['ok', 'fail', 'skip', 'total'].includes(t.toLowerCase())) tone = { ok: 'ok', fail: 'fail', skip: 'warn', total: 'total' }[t.toLowerCase()];
+    cw.appendChild(el('span', 'it-feat-chip' + (tone ? ' it-tone-' + tone : ''), t));
+  });
+  return cw;
+}
+function openFeatures(r, src, i) {
+  const dlg = $('feat-dlg'), body = $('feat-body');
+  $('feat-title').textContent = r.module + ' features';
+  body.replaceChildren();
+  if (r.purpose) {
+    const pb = el('div', 'it-feat-purpose');
+    pb.appendChild(el('div', 'it-feat-purpose-h', r.purposeLabel || 'Business purpose'));
+    const ul = el('ul'); r.purpose.forEach(t => ul.appendChild(el('li', null, t))); pb.appendChild(ul);
+    body.appendChild(pb);
+  }
+  if (r.access) { const ab = el('div', 'it-feat-access'); ab.appendChild(el('span', 'it-feat-lock', 'Access')); ab.appendChild(document.createTextNode(r.access)); body.appendChild(ab); }
+  r.features.forEach((f, k) => {
+    const card = el('div', 'it-feat' + (k % 2 ? ' alt' : ''));
+    card.appendChild(el('div', 'it-feat-n', String(k + 1)));
+    const txt = el('div', 'it-feat-t');
+    txt.appendChild(el('div', 'it-feat-name', f.name));
+    txt.appendChild(el('div', 'it-feat-desc', f.desc));
+    if (f.examples) {
+      const ex = el('div', 'it-feat-ex');
+      f.examples.forEach(x => { const b = el('div', 'it-feat-stat'); b.appendChild(el('span', 'it-feat-y', x.label)); b.appendChild(el('span', 'it-feat-v', x.value)); ex.appendChild(b); });
+      txt.appendChild(ex);
+    }
+    if (f.steps) { const ol = el('ol', 'it-feat-steps'); f.steps.forEach(t => ol.appendChild(el('li', null, t))); txt.appendChild(ol); }
+    if (f.chips) txt.appendChild(chipRow(f.chips));
+    if (f.groups) f.groups.forEach(g => {
+      const row = el('div', 'it-feat-grp');
+      row.appendChild(el('div', 'it-feat-grp-l', g.label));
+      row.appendChild(chipRow(g.chips));
+      txt.appendChild(row);
+    });
+    if (f.flow) {
+      const fl = el('div', 'it-feat-flow');
+      f.flow.forEach((t, k) => { if (k) fl.appendChild(el('span', 'it-feat-arrow', '→')); fl.appendChild(el('span', 'it-feat-flowstep', t)); });
+      txt.appendChild(fl);
+    }
+    if (f.points) { const ul = el('ul', 'it-feat-pts'); f.points.forEach(t => { const li = el('li'); richText(li, t); ul.appendChild(li); }); txt.appendChild(ul); }
+    if (f.roles) f.roles.forEach(rb => {
+      const box = el('div', 'it-feat-role');
+      const hd = el('div', 'it-feat-role-h');
+      hd.appendChild(el('span', 'it-feat-role-tag', rb.role + ' user'));
+      hd.appendChild(el('span', null, 'Additional features'));
+      box.appendChild(hd);
+      const ul = el('ul', 'it-feat-role-pts');
+      rb.points.forEach(t => {
+        const li = el('li');
+        richText(li, t);
+        ul.appendChild(li);
+      });
+      box.appendChild(ul); txt.appendChild(box);
+    });
+    if (f.note) txt.appendChild(el('div', 'it-feat-note', f.note));
+    card.appendChild(txt); body.appendChild(card);
+  });
+  dlg.showModal();
+}
+const QF = {}, catsBuilt = {};
+Object.values(TOOLS).filter(T => !T.placeholder).forEach(T => {
+  QF[T.ds] = { search: '', cat: '', like: '' };
+  [['q-search', 'search'], ['q-cat', 'cat'], ['q-like', 'like']].forEach(([id, k]) => {
+    const e = $(T.p + id); e.addEventListener('input', () => { QF[T.ds][k] = e.value; renderQA(T); });
+  });
+});
+function renderQA(T) {
+  const src = T.ds + '_qa', d = dash.data(src), F = QF[T.ds];
+  const list = $(T.p + 'q-list'); list.replaceChildren();
+  const cnt = $(T.p + 'q-count');
+  if (d.status !== 'ok') { cnt.textContent = d.status === 'error' ? 'Failed to load' : ''; return; }
+  if (!catsBuilt[T.ds]) {
+    const s = $(T.p + 'q-cat');
+    Array.from(new Set(d.data.map(r => r.category))).forEach(c => { const o = el('option', null, c); o.value = c; s.appendChild(o); });
+    catsBuilt[T.ds] = true;
+  }
+  const ord = { High: 0, Medium: 1, Low: 2 }, q = F.search.trim().toLowerCase();
+  const rows = d.data.filter(r => (!F.cat || r.category === F.cat) && (!F.like || r.likelihood === F.like) &&
+    (!q || (r.question + ' ' + r.answer.replace(/[{}]/g, '')).toLowerCase().includes(q)))
+    .sort((a, b) => ord[a.likelihood] - ord[b.likelihood] || a.id.localeCompare(b.id));
+  cnt.textContent = rows.length + ' of ' + d.data.length + ' questions · click to open';
+  rows.forEach(r => {
+    const w = 'id=' + encodeURIComponent(r.id);
+    const m = (e, f) => { e.dataset.source = src; e.dataset.field = f; e.dataset.where = w; return e; };
+    const det = el('details', 'it-q'), sum = el('summary');
+    sum.appendChild(m(el('span', 'it-qid', r.id), 'id'));
+    const b = el('div', 'it-qt');
+    b.appendChild(m(el('div', null, r.question), 'question'));
+    const ch = el('div', 'it-chips');
+    ch.appendChild(m(el('span', 'it-chip', r.category), 'category'));
+    ch.appendChild(m(el('span', 'it-chip' + (r.likelihood === 'High' ? ' it-high' : ''), r.likelihood), 'likelihood'));
+    b.appendChild(ch); sum.appendChild(b); det.appendChild(sum);
+    const body = el('div', 'it-body');
+    if (r.answer.includes('\n')) {
+      const ul = m(el('ul', 'it-pts'), 'answer');
+      r.answer.split('\n').forEach(t => ul.appendChild(el('li', null, t)));
+      body.appendChild(ul);
+    } else {
+      const p = m(el('p'), 'answer');
+      r.answer.split(/(\{\{.*?\}\})/).forEach(part => {
+        if (part.startsWith('{{') && part.endsWith('}}')) {
+          const v = el('span', 'it-verify', part.slice(2, -2));
+          v.appendChild(el('span', 'it-verify-tag', part.startsWith('{{INTERNAL') ? 'Internal only' : 'To verify'));
+          p.appendChild(v);
+        } else if (part) p.appendChild(document.createTextNode(part));
+      });
+      body.appendChild(p);
+    }
+    det.appendChild(body); list.appendChild(det);
+  });
+}
+function renderGeo() {
+  const src = 'cadmin_ca_geo', d = dash.data(src), tb = document.querySelector('#c-geotable tbody');
+  if (!tb) return; tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  let lastGroup = null;
+  d.data.forEach(r => {
+    if (r.group !== lastGroup) {
+      const gr = el('tr', 'it-geo-grp'); const td = el('td', null, r.group); td.colSpan = 9; gr.appendChild(td); tb.appendChild(gr); lastGroup = r.group;
+    }
+    const tr = el('tr');
+    const tt = el('td', 'it-geo-type'); tt.appendChild(el('div', null, r.type)); tt.appendChild(el('div', 'it-geo-note', r.note)); tr.appendChild(tt);
+    tr.appendChild(el('td', 'it-geo-in ' + (r.cadmin === 'Yes' ? 'yes' : 'no'), r.cadmin === 'Yes' ? '✓' : '—'));
+    ['na', 'eu', 'jp', 'cn', 'ind', 'ap'].forEach(k => {
+      const td = el('td', 'it-geo-cell');
+      td.appendChild(el('span', 'it-lvl it-lvl-' + r[k].charAt(0).toLowerCase(), r[k]));
+      tr.appendChild(td);
+    });
+    tr.appendChild(el('td', 'it-geo-mean', r.meaning));
+    tb.appendChild(tr);
+  });
+}
+dash.onData(() => {
+  Object.values(TOOLS).filter(T => !T.placeholder).forEach(T => {
+    renderFacts(T); renderTimeline(T);
+    fillTable(T.p + 'evotable', T.ds + '_evolution', ['area', 'capability', 'advantage'], { advantage: 'adv' });
+    renderFlow(T); renderModules(T);
+    fillTable(T.p + 'demotable', T.ds + '_demo', ['minute', 'screen', 'say', 'show']);
+    renderQA(T);
+  });
+  renderGeo();
+});
+(function init() {
+  const h = location.hash.slice(1);
+  const t = h.startsWith('c-') ? 'cadmin' : h.startsWith('x-') ? 'indexeq' : h.startsWith('k-') ? 'ical' : 'itics';
+  const sec = h.replace(/^[cxk]-/, '');
+  setTool(t, (TOOLS[t].secs || SECS).some(s => s[0] === sec) ? sec : 'overview');
+})();
+</script>
+</body></html>
